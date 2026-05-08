@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ToDoListApp.BLL/ToDoListApp.BLL.csproj" />
+  <Project Path="ToDoListApp.DAL/ToDoListApp.DAL.csproj" />
+  <Project Path="ToDoListApp.PL/ToDoListApp.PL.csproj" />
+</Solution>

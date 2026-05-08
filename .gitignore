@@ -1,0 +1,73 @@
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.sln.iml
+*.suo
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+*.dll
+*.exe
+*.pdb
+
+# NuGet
+packages/
+*.nupkg
+*.nuspec
+.nuget/
+
+# Local user-specific files
+*.local
+.idea/
+.DS_Store
+
+# Rider
+.idea/
+*.sln.iml
+*.iml
+
+# Visual Studio cache
+.vs/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS-specific
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+~*
+
+# Log files
+*.log
+logs/
+
+# Backup files
+*.backup
+
+# IDE
+.idea/
+.vscode/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Note: appsettings.json and appsettings.Development.json are NOT ignored
+# They should be committed to the repository
