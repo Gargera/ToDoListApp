@@ -69,8 +69,6 @@ logs/
 .env.local
 .env.*.local
 
-# Note: appsettings.json and appsettings.Development.json are NOT ignored
-# They should be committed to the repository
-/ToDoListApp.PL/appsettings.json
+# appsettings.json and appsettings.Development.json are ignored
 /ToDoListApp.PL/appsettings.json
 /ToDoListApp.PL/appsettings.Development.json
