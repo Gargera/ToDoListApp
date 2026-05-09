@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using ToDoListApp.BLL.Interfaces;
 using ToDoListApp.BLL.Services;
 using ToDoListApp.DAL;
+using ToDoListApp.DAL.Entities;
 using ToDoListApp.DAL.Interfaces;
 using ToDoListApp.DAL.Repositories;
 
@@ -29,6 +31,25 @@ namespace ToDoListApp.PL
             builder.Services.AddScoped<IToDoItemRepo, ToDoItemRepo>();
             builder.Services.AddScoped<IToDoItemService, ToDoItemService>();
 
+
+            builder.Services.AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireDigit = true;
+
+                options.User.RequireUniqueEmail = true;
+
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            })
+                .AddEntityFrameworkStores<ToDoListAppDbContext>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

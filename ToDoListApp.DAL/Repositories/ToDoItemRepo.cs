@@ -18,17 +18,17 @@ namespace ToDoListApp.DAL.Repositories
 
         public List<ToDoItem> GetAllToDoItems()
         {
-            return _toDoListAppDbContext.toDoItems.ToList();
+            return _toDoListAppDbContext.ToDoItems.ToList();
         }
 
         public ToDoItem? GetToDoItemById(int id)
         {
-            return _toDoListAppDbContext.toDoItems.Find(id);
+            return _toDoListAppDbContext.ToDoItems.Find(id);
         }
 
         public void CreateToDoItem(ToDoItem toDoItem)
         {
-            _toDoListAppDbContext.toDoItems.Add(toDoItem);
+            _toDoListAppDbContext.ToDoItems.Add(toDoItem);
             _toDoListAppDbContext.SaveChanges();
         }
 
@@ -42,7 +42,7 @@ namespace ToDoListApp.DAL.Repositories
 
         public void UpdateToDoItem(ToDoItem toDoItem)
         {
-            _toDoListAppDbContext.toDoItems.Update(toDoItem);
+            _toDoListAppDbContext.ToDoItems.Update(toDoItem);
             _toDoListAppDbContext.SaveChanges();
         }
     }

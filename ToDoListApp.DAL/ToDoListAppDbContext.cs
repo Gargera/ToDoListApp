@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,9 +8,9 @@ using ToDoListApp.DAL.Entities;
 
 namespace ToDoListApp.DAL
 {
-    public class ToDoListAppDbContext : DbContext
+    public class ToDoListAppDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<ToDoItem> toDoItems { get; set; }
+        public DbSet<ToDoItem> ToDoItems { get; set; }
 
         public ToDoListAppDbContext(DbContextOptions<ToDoListAppDbContext> options) : base(options) { }
 
@@ -32,6 +33,12 @@ namespace ToDoListApp.DAL
                         "Priority IN (0, 1, 2)");
                 });
             });
+
+            modelBuilder.Entity<ToDoItem>()
+                    .HasOne(t => t.User)
+                    .WithMany(u => u.ToDoItems)
+                    .HasForeignKey(t => t.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }
