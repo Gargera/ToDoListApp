@@ -253,8 +253,33 @@
         </div>
 
         <div class="card-body">
-            <form asp-action="Create" asp-controller="ToDoItem" method="post" id="createForm" novalidate>
+            <form asp-action="Create" asp-controller="ToDoItem" method="post" id="createForm">
                 @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert-error" style="background: #fef2f2; border: 1.5px solid #fca5a5;
+                        border-radius: 10px; padding: 12px 16px;
+                        display: flex; align-items: center; gap: 10px;
+                        margin-bottom: 20px; font-size: 13px; color: #7f1d1d;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                             style="flex-shrink:0;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div>
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                @foreach (var error in modelState.Errors)
+                                {
+                                    <div>@error.ErrorMessage</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
 
                 <div class="section-title">Task Details</div>
 
@@ -272,7 +297,7 @@
                             </svg>
                         </span>
                         <input asp-for="Title" class="form-input" id="titleInput"
-                               placeholder="e.g. Design landing page" maxlength="100" autocomplete="off" />
+                               placeholder="e.g. Design landing page" maxlength="100" autocomplete="off" required />
                     </div>
                     <div class="char-count" id="titleCount">0 / 100</div>
                     <span asp-validation-for="Title" class="field-error"></span>
@@ -410,8 +435,20 @@
         toggleTrack.classList.toggle('on', checkbox.checked);
         toggleWrap.classList.toggle('on', checkbox.checked);
 
-        document.getElementById('createForm').addEventListener('submit', function () {
-            const btn = document.getElementById('submitBtn');
+        document.getElementById('createForm').addEventListener('submit', function (e) {
+            const form = this;
+            const btn  = document.getElementById('submitBtn');
+
+            if (typeof $ !== 'undefined' && $(form).validate && !$(form).valid()) {
+                btn.disabled = true;
+                setTimeout(function () { btn.disabled = false; }, 300);
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                return;
+            }
+
             btn.classList.add('loading');
             btn.disabled = true;
         });

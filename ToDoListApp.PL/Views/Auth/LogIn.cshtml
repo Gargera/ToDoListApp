@@ -1,7 +1,7 @@
 ﻿@model LogInUserVm
 
 @{
-    ViewData["Title"] = "Sign In";
+    ViewData["Title"] = "SignIn";
 }
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,7 +154,7 @@
         </div>
 
         <div class="card-body">
-            <form asp-action="LogIn" asp-controller="Auth" method="post" id="loginForm" novalidate>
+            <form asp-action="LogIn" asp-controller="Auth" method="post" id="loginForm">
                 @Html.AntiForgeryToken()
 
                 @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
@@ -167,7 +167,19 @@
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
                         </svg>
-                        Invalid username or password. Please try again.
+                        <div>
+                            @{
+                                var hasFieldErrors = ViewData.ModelState.Values.Any(v => v.Errors.Count > 0);
+                                if (hasFieldErrors)
+                                {
+                                    <div>Please check the errors below and try again.</div>
+                                }
+                                else
+                                {
+                                    <div>Invalid username or password. Please try again.</div>
+                                }
+                            }
+                        </div>
                     </div>
                 }
 
@@ -186,9 +198,18 @@
                             </svg>
                         </span>
                         <input asp-for="UserName" class="form-input" id="userNameInput"
-                               placeholder="Your username" autocomplete="username" maxlength="20" />
+                               placeholder="Your username" autocomplete="username" maxlength="20" required />
                     </div>
-                    <span asp-validation-for="UserName" class="field-error"></span>
+                    <span asp-validation-for="UserName" class="field-error">
+                        @{
+                            var userNameError = ViewData.ModelState["UserName"]?.Errors.FirstOrDefault();
+                            if (userNameError != null)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>@userNameError.ErrorMessage</span>
+                            }
+                        }
+                    </span>
                 </div>
 
                 <div style="margin-bottom:28px;">
@@ -204,7 +225,7 @@
                             </svg>
                         </span>
                         <input asp-for="Password" class="form-input" id="passwordInput"
-                               type="password" placeholder="Your password" autocomplete="current-password" />
+                               type="password" placeholder="Your password" autocomplete="current-password" required />
                         <button type="button" class="toggle-pw" onclick="togglePw('passwordInput', this)" tabindex="-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -213,7 +234,16 @@
                             </svg>
                         </button>
                     </div>
-                    <span asp-validation-for="Password" class="field-error"></span>
+                    <span asp-validation-for="Password" class="field-error">
+                        @{
+                            var passwordError = ViewData.ModelState["Password"]?.Errors.FirstOrDefault();
+                            if (passwordError != null)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>@passwordError.ErrorMessage</span>
+                            }
+                        }
+                    </span>
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">
@@ -255,8 +285,20 @@
                 : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
         }
 
-        document.getElementById('loginForm').addEventListener('submit', function () {
-            const btn = document.getElementById('submitBtn');
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            const form = this;
+            const btn  = document.getElementById('submitBtn');
+
+            if (typeof $ !== 'undefined' && $(form).validate && !$(form).valid()) {
+                btn.disabled = true;
+                setTimeout(function () { btn.disabled = false; }, 300);
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                return; 
+            }
+
             btn.classList.add('loading');
             btn.disabled = true;
         });

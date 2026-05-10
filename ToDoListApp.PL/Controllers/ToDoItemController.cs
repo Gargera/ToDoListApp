@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ToDoListApp.BLL.Interfaces;
 using ToDoListApp.PL.Mapping;
 using ToDoListApp.PL.ViewModels.ToDoItemVms;
 
 namespace ToDoListApp.PL.Controllers
 {
+    [Authorize]
     public class ToDoItemController : Controller
     {
         private readonly IToDoItemService _toDoItemService;
@@ -23,6 +25,9 @@ namespace ToDoListApp.PL.Controllers
         [HttpPost]
         public IActionResult Create(CreateToDoItemVm createToDoItemVm)
         {
+            if (!ModelState.IsValid)
+                return View(createToDoItemVm);
+
             _toDoItemService.CreateToDoItem(createToDoItemVm.EntityToCreateToDoItemDto());
             return RedirectToAction("GetAll");
         }

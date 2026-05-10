@@ -35,7 +35,7 @@ namespace ToDoListApp.PL
             builder.Services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireDigit = true;
@@ -49,7 +49,13 @@ namespace ToDoListApp.PL
                 .AddDefaultTokenProviders();
 
             builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
-            
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Auth/LogIn";
+                options.AccessDeniedPath = "/Auth/AccessDenied";
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -63,6 +69,7 @@ namespace ToDoListApp.PL
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();

@@ -164,8 +164,30 @@
         </div>
 
         <div class="card-body">
-            <form asp-action="Register" asp-controller="Auth" method="post" id="registerForm" novalidate>
+            <form asp-action="Register" asp-controller="Auth" method="post" id="registerForm">
                 @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert-error">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                             style="flex-shrink:0;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div>
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                @foreach (var error in modelState.Errors)
+                                {
+                                    <div>@error.ErrorMessage</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
 
                 <div class="section-title">Account Info</div>
 
@@ -182,9 +204,18 @@
                             </svg>
                         </span>
                         <input asp-for="Email" class="form-input" id="emailInput"
-                               placeholder="you@example.com" autocomplete="email" type="email" />
+                               placeholder="you@example.com" autocomplete="email" type="email" required />
                     </div>
-                    <span asp-validation-for="Email" class="field-error"></span>
+                    <span asp-validation-for="Email" class="field-error">
+                        @{
+                            var emailError = ViewData.ModelState["Email"]?.Errors.FirstOrDefault();
+                            if (emailError != null)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>@emailError.ErrorMessage</span>
+                            }
+                        }
+                    </span>
                 </div>
 
                 <div style="margin-bottom:24px;">
@@ -200,10 +231,19 @@
                             </svg>
                         </span>
                         <input asp-for="UserName" class="form-input" id="userNameInput"
-                               placeholder="e.g. JohnDoe" maxlength="20" autocomplete="username" />
+                               placeholder="e.g. JohnDoe" maxlength="20" autocomplete="username" required />
                     </div>
                     <div class="char-count" id="userNameCount">0 / 20</div>
-                    <span asp-validation-for="UserName" class="field-error"></span>
+                    <span asp-validation-for="UserName" class="field-error">
+                        @{
+                            var userNameError = ViewData.ModelState["UserName"]?.Errors.FirstOrDefault();
+                            if (userNameError != null)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>@userNameError.ErrorMessage</span>
+                            }
+                        }
+                    </span>
                 </div>
 
                 <div class="section-title" style="margin-top:4px;">Security</div>
@@ -221,7 +261,7 @@
                             </svg>
                         </span>
                         <input asp-for="Password" class="form-input" id="passwordInput"
-                               type="password" placeholder="Min 8 characters" autocomplete="new-password" />
+                               type="password" placeholder="Min 8 characters (uppercase, lowercase, number)" autocomplete="new-password" required />
                         <button type="button" class="toggle-pw" onclick="togglePw('passwordInput', this)" tabindex="-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -237,7 +277,16 @@
                         <div class="strength-seg" id="seg4"></div>
                     </div>
                     <div class="strength-label" id="strengthLabel"></div>
-                    <span asp-validation-for="Password" class="field-error"></span>
+                    <span asp-validation-for="Password" class="field-error">
+                        @{
+                            var passwordError = ViewData.ModelState["Password"]?.Errors.FirstOrDefault();
+                            if (passwordError != null)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>@passwordError.ErrorMessage</span>
+                            }
+                        }
+                    </span>
                 </div>
 
                 <div style="margin-bottom:28px;">
@@ -252,7 +301,7 @@
                             </svg>
                         </span>
                         <input asp-for="ConfirmPassword" class="form-input" id="confirmInput"
-                               type="password" placeholder="Repeat your password" autocomplete="new-password" />
+                               type="password" placeholder="Repeat your password" autocomplete="new-password" required />
                         <button type="button" class="toggle-pw" onclick="togglePw('confirmInput', this)" tabindex="-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -262,7 +311,16 @@
                         </button>
                     </div>
                     <div class="pw-match-hint" id="matchHint" style="display:none;"></div>
-                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                    <span asp-validation-for="ConfirmPassword" class="field-error">
+                        @{
+                            var confirmError = ViewData.ModelState["ConfirmPassword"]?.Errors.FirstOrDefault();
+                            if (confirmError != null)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>@confirmError.ErrorMessage</span>
+                            }
+                        }
+                    </span>
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">
@@ -323,7 +381,7 @@
         const matchHint     = document.getElementById('matchHint');
         const segs          = ['seg1','seg2','seg3','seg4'].map(function(id) { return document.getElementById(id); });
         const strengthLabel = document.getElementById('strengthLabel');
-        const hasSpecial    = new RegExp('[0-9!#$%^&*]');
+        const hasSpecial    = new RegExp('[0-9]');
 
         const levels = [
             { color: '#ef4444', label: 'Weak' },
@@ -364,8 +422,20 @@
             }
         }
 
-        document.getElementById('registerForm').addEventListener('submit', function () {
-            const btn = document.getElementById('submitBtn');
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            const form = this;
+            const btn  = document.getElementById('submitBtn');
+
+            if (typeof $ !== 'undefined' && $(form).validate && !$(form).valid()) {
+                btn.disabled = true;
+                setTimeout(function () { btn.disabled = false; }, 300);
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                return;
+            }
+
             btn.classList.add('loading');
             btn.disabled = true;
         });
