@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using ToDoListApp.BLL.Interfaces;
 using ToDoListApp.BLL.Services;
-using ToDoListApp.DAL;
+using ToDoListApp.DAL.Database;
 using ToDoListApp.DAL.Entities;
 using ToDoListApp.DAL.Interfaces;
 using ToDoListApp.DAL.Repositories;

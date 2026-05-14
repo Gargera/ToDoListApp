@@ -1,32 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace ToDoListApp.DAL.Entities
 {
-    public class ToDoItem
+    public class ToDoItem : BaseEntity<int>
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         [Required]
-        [StringLength(100, MinimumLength = 3)]
-        public string Title { get; set; }
+        [StringLength(50, MinimumLength = 3)]
+        public string Title { get; set; } = null!;
 
         [MaxLength(200)]
         public string? Description { get; set; }
 
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; set; } = false;
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [EnumDataType(typeof(Priority))]
-        public Priority Priority { get; set; }
+        public Priority Priority { get; set; } = Priority.High;
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = null!;
 
         [ForeignKey(nameof(UserId))]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser User { get; set; } = null!;
+
+        public int? CategoryId { get; set; }
+
+        [ForeignKey(nameof(CategoryId))]
+        public virtual Category? Category { get; set; }
     }
 }

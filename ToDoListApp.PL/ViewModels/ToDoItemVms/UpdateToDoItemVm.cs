@@ -9,7 +9,7 @@ namespace ToDoListApp.PL.ViewModels.ToDoItemVms
 
         [Required(ErrorMessage = "Title is required.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 100 characters.")]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         [MaxLength(200, ErrorMessage = "Description cannot exceed 200 characters.")]
         public string? Description { get; set; }

@@ -9,11 +9,11 @@ namespace ToDoListApp.PL.ViewModels.AuthVms
         [RegularExpression(
          @"^(?=.*[a-z])(?=.*[A-Z])[A-Za-z0-9]+$",
          ErrorMessage = "Username must contain uppercase and lowercase letters only (no spaces, numbers, or special characters).")]
-        public string UserName { get; set; }
+        public string UserName { get; set; } = null!;
 
         [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters.")]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
     }
 }

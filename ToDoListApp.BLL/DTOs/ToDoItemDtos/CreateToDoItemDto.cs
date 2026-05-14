@@ -10,7 +10,7 @@ namespace ToDoListApp.BLL.DTOs.ToDoItemDtos
     public class CreateToDoItemDto
     {
         [StringLength(100, MinimumLength = 3)]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         [MaxLength(200)]
         public string? Description { get; set; }

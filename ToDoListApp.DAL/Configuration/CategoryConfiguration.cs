@@ -1,0 +1,29 @@
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace ToDoListApp.DAL.Configuration
+{
+    public class CategoryConfiguration : IEntityTypeConfiguration<Category>
+    {
+        public void Configure(EntityTypeBuilder<Category> builder)
+        {
+            builder.HasKey(c => c.Id);
+
+            builder.HasIndex(c => c.Name)
+                   .IsUnique();
+
+            builder.Property(c => c.Name)
+                   .IsRequired()
+                   .HasMaxLength(50);
+
+            builder.HasMany(c => c.ToDoItems)
+                   .WithOne(t => t.Category)
+                   .HasForeignKey(t => t.CategoryId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.ToTable("Categories", t =>
+            {
+                t.HasCheckConstraint("CK_Category_Name_Length", "LEN(Name) BETWEEN 3 AND 50");
+            });
+        }
+    }
+}
