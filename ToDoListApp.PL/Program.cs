@@ -5,13 +5,13 @@ using ToDoListApp.DAL.Common;
 using ToDoListApp.BLL.Common;
 using ToDoListApp.DAL.Database;
 using ToDoListApp.DAL.Entities;
-using ToDoListApp.DAL.Repositories;
+using ToDoListApp.PL.ExtensionMethods;
 
 namespace ToDoListApp.PL
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +60,9 @@ namespace ToDoListApp.PL
             });
 
             var app = builder.Build();
+
+            await app.ApplyPendingMigrationsAsync();
+            await app.SeedDataAsync();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

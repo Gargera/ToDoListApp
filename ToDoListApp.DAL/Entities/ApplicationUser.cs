@@ -9,6 +9,7 @@ namespace ToDoListApp.DAL.Entities
 {
     public class ApplicationUser : IdentityUser
     {
+        public string FullName { get; set; } = null!;
         public ICollection<Category> Categories { get; set; } = new List<Category>();
     }
 }
