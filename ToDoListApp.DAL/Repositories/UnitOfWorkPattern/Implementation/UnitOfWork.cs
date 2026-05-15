@@ -1,9 +1,9 @@
 ﻿using ToDoListApp.DAL.Database;
 using ToDoListApp.DAL.Repositories.GenericRepository.Abstraction;
 using ToDoListApp.DAL.Repositories.GenericRepository.Implementation;
-using ToDoListApp.DAL.UnitOfWork.Abstraction;
+using ToDoListApp.DAL.Repositories.UnitOfWorkPattern.Abstraction;
 
-namespace ToDoListApp.DAL.UnitOfWork.Implementation
+namespace ToDoListApp.DAL.Repositories.UnitOfWorkPattern.Implementation
 {
     public class UnitOfWork : IUnitOfWork
     {

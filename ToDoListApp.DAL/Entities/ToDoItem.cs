@@ -9,7 +9,7 @@ namespace ToDoListApp.DAL.Entities
         [StringLength(50, MinimumLength = 3)]
         public string Title { get; set; } = null!;
 
-        [MaxLength(200)]
+        [MaxLength(400)]
         public string? Description { get; set; }
 
         public bool IsCompleted { get; set; } = false;
@@ -18,14 +18,9 @@ namespace ToDoListApp.DAL.Entities
         [EnumDataType(typeof(Priority))]
         public Priority Priority { get; set; } = Priority.High;
 
-        public string UserId { get; set; } = null!;
-
-        [ForeignKey(nameof(UserId))]
-        public virtual ApplicationUser User { get; set; } = null!;
-
-        public int? CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         [ForeignKey(nameof(CategoryId))]
-        public virtual Category? Category { get; set; }
+        public Category Category { get; set; } = null!;
     }
 }

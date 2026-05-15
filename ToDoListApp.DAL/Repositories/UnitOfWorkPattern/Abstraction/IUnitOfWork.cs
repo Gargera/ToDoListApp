@@ -1,6 +1,6 @@
 ﻿using ToDoListApp.DAL.Repositories.GenericRepository.Abstraction;
 
-namespace ToDoListApp.DAL.UnitOfWork.Abstraction
+namespace ToDoListApp.DAL.Repositories.UnitOfWorkPattern.Abstraction
 {
     public interface IUnitOfWork : IDisposable
     {

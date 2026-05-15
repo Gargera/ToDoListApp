@@ -4,9 +4,9 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Abstraction
 {
     public interface IGenericRepository<TEntity>
     {
-        public IQueryable<TEntity> GetAllEntities();
+        public Task<IEnumerable<TEntity>> GetAllEntitiesAsync(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includes);
 
-        public IQueryable<TEntity> GetEntityById(int id);
+        public Task<TEntity?> GetEntityByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes);
 
         public Task AddEntityAsync(TEntity entity);
 

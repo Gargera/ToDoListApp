@@ -12,8 +12,11 @@ namespace ToDoListApp.DAL.Configuration
                    .IsRequired()
                    .HasMaxLength(50);
 
+            builder.HasIndex(c => c.Title)
+                   .IsUnique();
+
             builder.Property(t => t.Description)
-                   .HasMaxLength(200);
+                   .HasMaxLength(400);
 
             builder.Property(t => t.IsCompleted)
                    .HasDefaultValue(false);
@@ -22,20 +25,13 @@ namespace ToDoListApp.DAL.Configuration
                    .HasConversion<int>()
                    .HasDefaultValue(Priority.High);
 
-            builder.Property(t => t.UserId)
+            builder.Property(t => t.CategoryId)
                    .IsRequired();
 
-            builder.HasIndex(t => t.UserId);
-
-            builder.HasIndex(t => t.CategoryId);
-
-            builder.HasOne(t => t.User)
-                   .WithMany(u => u.ToDoItems)
-                   .HasForeignKey(t => t.UserId)
-                   .OnDelete(DeleteBehavior.SetNull);
-
-            builder.Property(t => t.CategoryId)
-                   .IsRequired(false);
+            builder.HasOne(t => t.Category)
+                   .WithMany(c => c.ToDoItems)
+                   .HasForeignKey(t => t.CategoryId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.CreatedDate)
                    .HasColumnType("datetime2")

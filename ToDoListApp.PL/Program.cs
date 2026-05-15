@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using ToDoListApp.BLL.Interfaces;
-using ToDoListApp.BLL.Services;
+using ToDoListApp.DAL.Common;
+using ToDoListApp.BLL.Common;
 using ToDoListApp.DAL.Database;
 using ToDoListApp.DAL.Entities;
-using ToDoListApp.DAL.Interfaces;
 using ToDoListApp.DAL.Repositories;
 
 namespace ToDoListApp.PL
@@ -17,20 +16,24 @@ namespace ToDoListApp.PL
             var builder = WebApplication.CreateBuilder(args);
 
             var ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            
+
             builder.Services.AddDbContext<ToDoListAppDbContext>(options =>
                 options.UseSqlServer(ConnectionString)
                        .LogTo(message => Debug.WriteLine(message), Microsoft.Extensions.Logging.LogLevel.Information)
                        .EnableSensitiveDataLogging()
-                     //.UseLazyLoadingProxies()
             );
-
+            
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddScoped<IToDoItemRepo, ToDoItemRepo>();
-            builder.Services.AddScoped<IToDoItemService, ToDoItemService>();
+            builder.Services.AddBusinessInDAL();
+            builder.Services.AddBusinessInBLL ();
 
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile(typeof(BLL.Mapper.DomainProfile));
+                cfg.AddProfile(typeof(PL.Mapper.DomainProfile));
+            });
 
             builder.Services.AddIdentityCore<ApplicationUser>(options =>
             {
@@ -52,8 +55,8 @@ namespace ToDoListApp.PL
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Auth/LogIn";
-                options.AccessDeniedPath = "/Auth/AccessDenied";
+                options.LoginPath = "/Account/LogIn";
+                options.AccessDeniedPath = "/Account/AccessDenied";
             });
 
             var app = builder.Build();

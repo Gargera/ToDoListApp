@@ -11,9 +11,24 @@ namespace ToDoListApp.DAL.Configuration
             builder.HasIndex(c => c.Name)
                    .IsUnique();
 
+            builder.Property(c => c.Description)
+                   .HasMaxLength(200);
+
             builder.Property(c => c.Name)
                    .IsRequired()
                    .HasMaxLength(50);
+
+            builder.Property(t => t.UserId)
+                   .IsRequired();
+
+            builder.HasOne(c => c.User)
+                   .WithMany(u => u.Categories)
+                   .HasForeignKey(c => c.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(c => c.IsSystem)
+                   .IsRequired()
+                   .HasDefaultValue(false);
 
             builder.HasMany(c => c.ToDoItems)
                    .WithOne(t => t.Category)
