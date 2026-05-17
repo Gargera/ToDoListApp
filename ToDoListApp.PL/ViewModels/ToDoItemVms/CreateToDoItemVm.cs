@@ -1,20 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ToDoListApp.DAL.Entities;
+using ToDoListApp.DAL.Enums;
 
 namespace ToDoListApp.PL.ViewModels.ToDoItemVms
 {
     public class CreateToDoItemVm
     {
         [Required(ErrorMessage = "Title is required.")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 100 characters.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 50 characters.")]
         public string Title { get; set; } = null!;
 
-        [MaxLength(200, ErrorMessage = "Description cannot exceed 200 characters.")]
+        [MaxLength(400, ErrorMessage = "Description cannot exceed 400 characters.")]
         public string? Description { get; set; }
 
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; set; } = false;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        [EnumDataType(typeof(Priority), ErrorMessage = "Please select a valid priority.")]
-        public Priority Priority { get; set; }
+        [EnumDataType(typeof(Priority))]
+        public Priority Priority { get; set; } = Priority.High;
+
+        public int CategoryId { get; set; }
     }
 }

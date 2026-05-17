@@ -164,7 +164,7 @@
         </div>
 
         <div class="card-body">
-            <form asp-action="Register" asp-controller="Auth" method="post" id="registerForm">
+            <form asp-action="Index" asp-controller="Account" method="post" id="registerForm">
                 @Html.AntiForgeryToken()
 
                 @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
@@ -234,16 +234,21 @@
                                placeholder="e.g. JohnDoe" maxlength="20" autocomplete="username" required />
                     </div>
                     <div class="char-count" id="userNameCount">0 / 20</div>
-                    <span asp-validation-for="UserName" class="field-error">
+                    <div class="field-error-container">
                         @{
                             var userNameError = ViewData.ModelState["UserName"]?.Errors.FirstOrDefault();
                             if (userNameError != null)
                             {
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                <span>@userNameError.ErrorMessage</span>
+                                <div class="field-error">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    <span>@userNameError.ErrorMessage</span>
+                                </div>
                             }
                         }
-                    </span>
+                    </div>
                 </div>
 
                 <div class="section-title" style="margin-top:4px;">Security</div>
@@ -336,7 +341,7 @@
 
                 <p style="text-align:center; margin-top:16px; font-size:13px; color:#9ca3af;">
                     Already have an account?
-                    <a asp-action="LogIn" asp-controller="Auth"
+                    <a asp-action="LogIn" asp-controller="Account"
                        style="color:#10b981; font-weight:600; text-decoration:none;"
                        onmouseover="this.style.textDecoration='underline'"
                        onmouseout="this.style.textDecoration='none'">Sign in</a>

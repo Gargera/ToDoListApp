@@ -1,39 +1,21 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using ToDoListApp.BLL.Interfaces;
-using ToDoListApp.PL.Mapping;
 using ToDoListApp.PL.Models;
 using ToDoListApp.PL.ViewModels.HomeVms;
-using ToDoListApp.PL.ViewModels.ToDoItemVms;
 
 namespace ToDoListApp.PL.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IToDoItemService _toDoItemService;
+        private readonly ICategoryService _categoryService;
 
-        public HomeController(IToDoItemService toDoItemService)
+        public HomeController(IToDoItemService toDoItemService, ICategoryService categoryService)
         {
             _toDoItemService = toDoItemService;
+            _categoryService = categoryService;
         }
 
         public IActionResult Index()
-        {
-            var allToDoItems = _toDoItemService.GetAllToDoItemsDtos()
-                                               .Select(t => t.EntityToGetToDoItemVm())
-                                               .ToList();
-
-            var homeIndexVm = new HomeIndexVm
-            {
-                TotalTasks = allToDoItems.Count,
-                CompletedTasks = allToDoItems.Count(x => x.IsCompleted),
-                PendingTasks = allToDoItems.Count(x => !x.IsCompleted)
-            };
-
-            return View(homeIndexVm);
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }

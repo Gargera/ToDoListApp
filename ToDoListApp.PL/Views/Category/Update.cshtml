@@ -1,0 +1,508 @@
+@model UpdateCategoryVm
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: #f0f4f8;
+        min-height: 100vh;
+    }
+
+    .page-bg {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #e8f4fd 0%, #f0f4f8 50%, #fef9f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 16px;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 520px;
+        overflow: hidden;
+        animation: fadeUp 0.45s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+        padding: 32px;
+        text-align: center;
+        position: relative;
+    }
+    .card-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px; left: 0; right: 0;
+        height: 20px;
+        background: #fff;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .header-icon {
+        width: 56px; height: 56px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+    }
+
+    .info-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.9);
+        margin-top: 10px;
+    }
+
+    .card-body { padding: 32px; }
+
+    .field-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .field-wrap { position: relative; }
+
+    .field-icon {
+        position: absolute;
+        left: 12px; top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+        transition: color 0.2s;
+        display: flex; align-items: center;
+    }
+    .field-wrap:focus-within .field-icon { color: #8b5cf6; }
+
+    .textarea-icon {
+        position: absolute;
+        left: 12px; top: 14px;
+        color: #9ca3af;
+        pointer-events: none;
+        transition: color 0.2s;
+    }
+    .field-wrap:focus-within .textarea-icon { color: #8b5cf6; }
+
+    .form-input {
+        width: 100%;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 11px 14px 11px 40px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        color: #111827;
+        background: #fafafa;
+        transition: all 0.2s;
+        outline: none;
+    }
+    .form-input:focus {
+        border-color: #8b5cf6;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+    }
+    .form-input::placeholder { color: #d1d5db; }
+
+    .form-textarea {
+        width: 100%;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 11px 14px 11px 40px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        color: #111827;
+        background: #fafafa;
+        transition: all 0.2s;
+        outline: none;
+        resize: vertical;
+        min-height: 100px;
+    }
+    .form-textarea:focus {
+        border-color: #8b5cf6;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+    }
+    .form-textarea::placeholder { color: #d1d5db; }
+
+    .char-count { font-size: 11px; color: #9ca3af; text-align: right; margin-top: 4px; }
+    .char-count.warn { color: #f59e0b; }
+    .char-count.over { color: #ef4444; }
+
+    .section-title {
+        font-size: 11px; font-weight: 700;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        color: #9ca3af; margin-bottom: 16px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after {
+        content: ''; flex: 1; height: 1px; background: #f3f4f6;
+    }
+
+    .readonly-field {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        background: #f3f4f6;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #6b7280;
+        cursor: not-allowed;
+    }
+    .readonly-field svg { color: #9ca3af; flex-shrink: 0; }
+    .readonly-badge {
+        margin-left: auto;
+        font-size: 10px; font-weight: 600;
+        letter-spacing: 0.05em; text-transform: uppercase;
+        color: #9ca3af;
+        background: #e5e7eb;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .field-error {
+        color: #ef4444; font-size: 12px; margin-top: 5px;
+        display: flex; align-items: center; gap: 4px;
+    }
+
+    .btn-submit {
+        width: 100%; padding: 13px;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 700; font-size: 14px; letter-spacing: 0.04em;
+        border: none; border-radius: 10px;
+        cursor: pointer; position: relative; overflow: hidden;
+        transition: all 0.2s;
+        box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.45); }
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-submit.loading .btn-text { opacity: 0; }
+    .btn-submit.loading .btn-loader { opacity: 1; }
+    .btn-loader {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity 0.15s;
+    }
+    .spinner {
+        width: 20px; height: 20px;
+        border: 2.5px solid rgba(255,255,255,0.35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.65s linear infinite;
+    }
+
+    @@keyframes spin    { to { transform: rotate(360deg); } }
+    @@keyframes fadeUp  { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+        background: #fff;
+        border-radius: 18px;
+        padding: 32px;
+        width: 100%; max-width: 380px;
+        margin: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        animation: modalIn 0.25s cubic-bezier(.16,1,.3,1);
+    }
+    @@keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-icon {
+        width: 52px; height: 52px;
+        background: #f5f3ff;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .modal-title {
+        font-size: 17px; font-weight: 700;
+        color: #111827; text-align: center; margin: 0 0 6px;
+    }
+
+    .modal-desc {
+        font-size: 13px; color: #6b7280;
+        text-align: center; margin: 0 0 24px; line-height: 1.5;
+    }
+
+    .modal-actions {
+        display: flex; gap: 10px;
+    }
+
+    .modal-cancel {
+        flex: 1; padding: 11px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px; font-weight: 600;
+        color: #6b7280; cursor: pointer;
+        transition: all 0.18s;
+    }
+    .modal-cancel:hover { border-color: #d1d5db; color: #374151; background: #f9fafb; }
+
+    .modal-confirm-save {
+        flex: 1; padding: 11px;
+        border: none; border-radius: 10px;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px; font-weight: 700;
+        color: #fff; cursor: pointer;
+        transition: all 0.18s;
+        box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+    }
+    .modal-confirm-save:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,92,246,0.4); }
+</style>
+
+<div class="modal-overlay" id="saveModal">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                 fill="none" stroke="#8b5cf6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+        </div>
+        <p class="modal-title">Save Changes?</p>
+        <p class="modal-desc">Are you sure you want to update this category? Your changes will be saved permanently.</p>
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeSaveModal()">Cancel</button>
+            <button class="modal-confirm-save" onclick="confirmSave()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<div class="page-bg">
+    <div class="form-card">
+        <div class="card-header">
+            <div class="header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
+                     fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+            </div>
+            <h1 style="font-family:'Plus Jakarta Sans',sans-serif; font-size:22px; font-weight:700; color:#fff; margin:0;">
+                Edit Category
+            </h1>
+            <p style="color:rgba(255,255,255,0.75); font-size:13px; margin-top:4px;">
+                Update your category details
+            </p>
+            <div class="info-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Category ID is read-only
+            </div>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Update" asp-controller="Category" method="post" id="updateForm">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert-error" style="background: #fef2f2; border: 1.5px solid #fca5a5;
+                        border-radius: 10px; padding: 12px 16px;
+                        display: flex; align-items: center; gap: 10px;
+                        margin-bottom: 20px; font-size: 13px; color: #7f1d1d;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                             style="flex-shrink:0;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div>
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                @foreach (var error in modelState.Errors)
+                                {
+                                    <div>@error.ErrorMessage</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="IsSystem" />
+                <input type="hidden" asp-for="UserId" />
+
+                <div class="section-title">Read-only Info</div>
+
+                <div style="margin-bottom:24px;">
+                    <label class="field-label">Category ID</label>
+                    <div class="readonly-field">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        #@Model.Id
+                        <span class="readonly-badge">Fixed</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Category Details</div>
+
+                <div style="margin-bottom:18px;">
+                    <label asp-for="Name" class="field-label">
+                        Category Name <span style="color:#ef4444;">*</span>
+                    </label>
+                    <div class="field-wrap">
+                        <span class="field-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 7h-4.18A3 3 0 0 0 16 5.18V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v1.18A3 3 0 0 0 8.18 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"></path>
+                            </svg>
+                        </span>
+                        <input asp-for="Name" class="form-input" id="nameInput"
+                               placeholder="e.g. Work, Personal, Shopping" maxlength="50" autocomplete="off" required />
+                    </div>
+                    <div class="char-count" id="nameCount">0 / 50</div>
+                    <span asp-validation-for="Name" class="field-error"></span>
+                </div>
+
+                <div style="margin-bottom:24px;">
+                    <label asp-for="Description" class="field-label">
+                        Description
+                        <span style="color:#9ca3af; font-weight:400; font-size:12px;">(optional)</span>
+                    </label>
+                    <div class="field-wrap">
+                        <span class="textarea-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="17" y1="10" x2="3" y2="10"></line>
+                                <line x1="21" y1="6" x2="3" y2="6"></line>
+                                <line x1="21" y1="14" x2="3" y2="14"></line>
+                                <line x1="17" y1="18" x2="3" y2="18"></line>
+                            </svg>
+                        </span>
+                        <textarea asp-for="Description" class="form-textarea" id="descInput"
+                                  placeholder="What kind of tasks does this category hold?" maxlength="100"></textarea>
+                    </div>
+                    <div class="char-count" id="descCount">0 / 100</div>
+                    <span asp-validation-for="Description" class="field-error"></span>
+                </div>
+
+                <button type="button" class="btn-submit" id="submitBtn" onclick="openSaveModal()">
+                    <span class="btn-text" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        SAVE CHANGES
+                    </span>
+                    <span class="btn-loader">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
+
+                <a asp-action="Index" asp-controller="Category"
+                   style="display:block; text-align:center; margin-top:16px; font-size:13px;
+                          color:#9ca3af; text-decoration:none; transition:color 0.2s;"
+                   onmouseover="this.style.color='#6b7280'"
+                   onmouseout="this.style.color='#9ca3af'">
+                    ← Back to categories
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        function initCounter(inputId, counterId, max) {
+            const input = document.getElementById(inputId);
+            const el    = document.getElementById(counterId);
+            if (!input || !el) return;
+            const update = () => {
+                const n = input.value.length;
+                el.textContent = n + ' / ' + max;
+                el.className = 'char-count' + (n >= max ? ' over' : n >= max * 0.85 ? ' warn' : '');
+            };
+            input.addEventListener('input', update);
+            update();
+        }
+        initCounter('nameInput', 'nameCount', 50);
+        initCounter('descInput', 'descCount', 100);
+
+        function openSaveModal() {
+            document.getElementById('saveModal').classList.add('open');
+        }
+
+        function closeSaveModal() {
+            document.getElementById('saveModal').classList.remove('open');
+        }
+
+        function confirmSave() {
+            const form = document.getElementById('updateForm');
+            const btn  = document.getElementById('submitBtn');
+
+            if (typeof $ !== 'undefined' && $(form).validate && !$(form).valid()) {
+                closeSaveModal();
+                btn.disabled = true;
+                setTimeout(function () { btn.disabled = false; }, 300);
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                closeSaveModal();
+                form.reportValidity();
+                return;
+            }
+
+            closeSaveModal();
+            btn.classList.add('loading');
+            btn.disabled = true;
+            form.submit();
+        }
+
+        document.getElementById('saveModal').addEventListener('click', function(e) {
+            if (e.target === this) closeSaveModal();
+        });
+    </script>
+}

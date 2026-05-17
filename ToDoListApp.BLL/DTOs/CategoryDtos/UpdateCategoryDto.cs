@@ -17,9 +17,8 @@ namespace ToDoListApp.BLL.DTOs.CategoryDtos
         [StringLength(50, MinimumLength = 3)]
         public string Name { get; set; } = null!;
 
-        [Required]
         [MaxLength(100)]
-        public string Description { get; set; } = null!;
+        public string? Description { get; set; } = null!;
 
         public bool IsSystem { get; set; } = false;
 

@@ -1,0 +1,633 @@
+@model IEnumerable<GetCategoryVm>
+
+@{
+    ViewData["Title"] = "Categories";
+    var categories = Model?.ToList() ?? new List<ToDoListApp.PL.ViewModels.CategoryVms.GetCategoryVm>();
+    var total = categories.Count;
+    var systemCategories = categories.Count(x => x.IsSystem);
+    var userCategories = total - systemCategories;
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: linear-gradient(135deg, #e8f4fd 0%, #f0f4f8 50%, #fef9f0 100%);
+        min-height: 100vh;
+    }
+
+    .page-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 16px 60px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+        border-radius: 20px;
+        padding: 32px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 30px rgba(59,130,246,0.25);
+        animation: fadeUp 0.4s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    .stat-chip {
+        background: rgba(255,255,255,0.18);
+        border-radius: 10px;
+        padding: 12px 20px;
+        text-align: center;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.2);
+        min-width: 90px;
+    }
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+        animation: fadeUp 0.4s 0.08s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-icon {
+        position: absolute; left: 12px; top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af; pointer-events: none;
+    }
+    .search-input {
+        width: 100%;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 14px 10px 40px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px; color: #111827;
+        background: #fff;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .search-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .search-input::placeholder { color: #d1d5db; }
+
+    .btn-new {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        color: #fff;
+        border: none; border-radius: 10px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px; font-weight: 700;
+        cursor: pointer; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 6px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        white-space: nowrap;
+    }
+    .btn-new:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.4); }
+
+    .category-card {
+        background: #fff;
+        border-radius: 14px;
+        border: 1.5px solid #f3f4f6;
+        padding: 20px;
+        transition: all 0.2s;
+        animation: fadeUp 0.4s cubic-bezier(.16,1,.3,1) both;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card:hover {
+        border-color: #e5e7eb;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+
+    .category-card.system-card {
+        background: linear-gradient(135deg, #fef9f0 0%, #ffffff 100%);
+        border-color: #fed7aa;
+    }
+
+    .system-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        letter-spacing: 0.04em;
+    }
+
+    .category-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .category-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 6px 0;
+        line-height: 1.4;
+        padding-right: 80px;
+    }
+
+    .category-desc {
+        font-size: 13px;
+        color: #6b7280;
+        margin: 0 0 16px 0;
+        line-height: 1.5;
+    }
+
+    .category-stats {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1.5px solid #f3f4f6;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1.5px solid #e5e7eb;
+        background: #fafafa;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.18s;
+        color: #6b7280;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .action-btn:hover { border-color: #d1d5db; color: #374151; background: #f3f4f6; }
+    .action-btn.edit:hover { border-color: #93c5fd; color: #3b82f6; background: #eff6ff; }
+    .action-btn.delete:hover { border-color: #fca5a5; color: #ef4444; background: #fef2f2; }
+    .action-btn.view:hover { border-color: #6ee7b7; color: #10b981; background: #ecfdf5; }
+
+    .action-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .empty-state {
+        text-align: center; padding: 60px 20px;
+        background: #fff; border-radius: 14px;
+        border: 1.5px dashed #e5e7eb;
+    }
+
+    .grid-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .category-card.hidden-filter { display: none; }
+
+    .modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+        background: #fff;
+        border-radius: 18px;
+        padding: 32px;
+        width: 100%; max-width: 380px;
+        margin: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        animation: modalIn 0.25s cubic-bezier(.16,1,.3,1);
+    }
+    @@keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-icon {
+        width: 52px; height: 52px;
+        background: #fef2f2;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .modal-title {
+        font-size: 17px; font-weight: 700;
+        color: #111827; text-align: center; margin: 0 0 6px;
+    }
+
+    .modal-desc {
+        font-size: 13px; color: #6b7280;
+        text-align: center; margin: 0 0 24px; line-height: 1.5;
+    }
+
+    .modal-actions {
+        display: flex; gap: 10px;
+    }
+
+    .modal-cancel {
+        flex: 1; padding: 11px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px; font-weight: 600;
+        color: #6b7280; cursor: pointer;
+        transition: all 0.18s;
+    }
+    .modal-cancel:hover { border-color: #d1d5db; color: #374151; background: #f9fafb; }
+
+    .modal-confirm-delete {
+        flex: 1; padding: 11px;
+        border: none; border-radius: 10px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px; font-weight: 700;
+        color: #fff; cursor: pointer;
+        transition: all 0.18s;
+        box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+    }
+    .modal-confirm-delete:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(239,68,68,0.4); }
+
+    .toast-message {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #10b981;
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1100;
+        animation: slideInRight 0.3s cubic-bezier(.16,1,.3,1);
+    }
+
+    @@keyframes slideInRight {
+        from { opacity: 0; transform: translateX(100px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @@media (max-width: 640px) {
+        .grid-layout { grid-template-columns: 1fr; }
+        .stat-chip { min-width: 70px; padding: 10px 12px; }
+        .page-header { padding: 22px; }
+    }
+</style>
+
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                 fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                <path d="M10 11v6"></path><path d="M14 11v6"></path>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+            </svg>
+        </div>
+        <p class="modal-title">Delete Category?</p>
+        <p class="modal-desc">This action cannot be undone. All tasks in this category will be moved to "General".</p>
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <button class="modal-confirm-delete" id="modalConfirmBtn" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="page-wrap">
+    <div class="page-header">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+            <div>
+                <h1 style="font-size:24px; font-weight:700; color:#fff; margin:0;">Categories</h1>
+                <p style="color:rgba(255,255,255,0.75); font-size:13px; margin-top:4px;">
+                    Organize your tasks by categories
+                </p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="stat-chip">
+                    <div style="font-size:22px; font-weight:700; color:#fff;">@total</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">Total</div>
+                </div>
+                <div class="stat-chip">
+                    <div style="font-size:22px; font-weight:700; color:#fff;">@userCategories</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">Custom</div>
+                </div>
+                <div class="stat-chip">
+                    <div style="font-size:22px; font-weight:700; color:#fff;">@systemCategories</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">System</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <span class="search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search categories..." />
+        </div>
+
+        <a asp-action="Create" asp-controller="Category" class="btn-new">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Category
+        </a>
+    </div>
+
+    <div id="categoryList" class="grid-layout">
+        @if (!categories.Any())
+        {
+            <div class="empty-state" style="grid-column:1/-1;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                     fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                     style="margin:0 auto 16px;">
+                    <path d="M20 7h-4.18A3 3 0 0 0 16 5.18V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v1.18A3 3 0 0 0 8.18 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"></path>
+                    <line x1="12" y1="12" x2="12" y2="17"></line>
+                    <line x1="9" y1="14" x2="15" y2="14"></line>
+                </svg>
+                <p style="font-size:16px; font-weight:600; color:#374151; margin:0;">No categories yet</p>
+                <p style="font-size:13px; color:#9ca3af; margin-top:6px;">Create your first category to organize tasks</p>
+                <a asp-action="Create" asp-controller="Category" class="btn-new"
+                   style="margin-top:20px; display:inline-flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Create Category
+                </a>
+            </div>
+        }
+        else
+        {
+            var delay = 0;
+            foreach (var category in categories)
+            {
+                var taskCount = category.ToDoItems?.Count ?? 0;
+                var completedCount = category.ToDoItems?.Count(x => x.IsCompleted) ?? 0;
+
+                <div class="category-card @(category.IsSystem ? "system-card" : "")"
+                     data-name="@category.Name.ToLower()"
+                     data-id="@category.Id"
+                     style="animation-delay:@(delay * 0.05)s;"
+                     onclick="viewCategory(@category.Id)">
+
+                    @if (category.IsSystem)
+                    {
+                        <div class="system-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            System
+                        </div>
+                    }
+
+                    <div class="category-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                             fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 7h-4.18A3 3 0 0 0 16 5.18V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v1.18A3 3 0 0 0 8.18 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"></path>
+                        </svg>
+                    </div>
+
+                    <h3 class="category-title">@category.Name</h3>
+
+                    @if (!string.IsNullOrEmpty(category.Description))
+                    {
+                        <p class="category-desc">@category.Description</p>
+                    }
+
+                    <div class="category-stats">
+                        <div class="stat-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                                <line x1="9" y1="20" x2="15" y2="20"></line>
+                                <line x1="12" y1="4" x2="12" y2="20"></line>
+                            </svg>
+                            <span>@taskCount tasks</span>
+                        </div>
+                        @if (taskCount > 0)
+                        {
+                            <div class="stat-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>@completedCount completed</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="action-buttons" onclick="event.stopPropagation()">
+                        <a asp-action="Index" asp-controller="ToDoItem"
+                           asp-route-CategoryId="@category.Id" class="action-btn view">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="18 15 12 9 6 15"></polyline>
+                            </svg>
+                            View Tasks
+                        </a>
+
+                        @if (!category.IsSystem)
+                        {
+                            <a asp-action="Update" asp-controller="Category"
+                               asp-route-id="@category.Id" class="action-btn edit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Edit
+                            </a>
+                            <a class="action-btn delete"
+                               href="javascript:void(0)"
+                               onclick="openDeleteModal('@Url.Action("Delete", "Category", new { id = category.Id })')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                </svg>
+                                Delete
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="action-btn disabled" title="System category cannot be edited">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Edit
+                            </div>
+                            <div class="action-btn disabled" title="System category cannot be deleted">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                </svg>
+                                Delete
+                            </div>
+                        }
+                    </div>
+                </div>
+                delay++;
+            }
+        }
+    </div>
+
+    <div id="noResults" style="display:none;">
+        <div class="empty-state" style="grid-column:1/-1;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                 style="margin:0 auto 14px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <p style="font-size:15px; font-weight:600; color:#374151; margin:0;">No categories found</p>
+            <p style="font-size:13px; color:#9ca3af; margin-top:6px;">Try a different search term</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let pendingDeleteUrl = '';
+
+        function viewCategory(id) {
+            window.location.href = '@Url.Action("GetToDoItemsByCategory", "Category")/' + id;
+        }
+
+        function openDeleteModal(url) {
+            pendingDeleteUrl = url;
+            document.getElementById('deleteModal').classList.add('open');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('open');
+            pendingDeleteUrl = '';
+        }
+
+        function confirmDelete() {
+            if (pendingDeleteUrl) {
+                window.location.href = pendingDeleteUrl;
+            }
+        }
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.category-card');
+            let visible = 0;
+
+            cards.forEach(card => {
+                const name = card.dataset.name || '';
+                const matches = !query || name.includes(query);
+
+                if (matches) {
+                    card.classList.remove('hidden-filter');
+                    visible++;
+                } else {
+                    card.classList.add('hidden-filter');
+                }
+            });
+
+            document.getElementById('noResults').style.display =
+                (visible === 0 && cards.length > 0) ? 'block' : 'none';
+        });
+
+        // Check URL for success parameter and show toast
+        @if (TempData["Success"] != null)
+        {
+            <text>
+            showToast('@TempData["Success"]');
+            </text>
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+}

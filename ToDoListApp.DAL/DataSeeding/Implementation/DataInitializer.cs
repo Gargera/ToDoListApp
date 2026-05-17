@@ -16,26 +16,30 @@ namespace ToDoListApp.DAL.DataSeeding.Implementation
 
         public async Task InitializeIdentityDataAsync()
         {
+            if(!await _roleManager.RoleExistsAsync("User"))
+            {
+                var userRole = new IdentityRole("User");    
+                await _roleManager.CreateAsync(userRole);
+            }
+
             if (!await _roleManager.RoleExistsAsync("Admin"))
             {
                 var adminRole = new IdentityRole("Admin");
                 await _roleManager.CreateAsync(adminRole);
             }
 
-            var adminEmail = "esraaTaha3092001@gmail.com";
+            var adminEmail = "esraaTaha@gmail.com";
 
             var admin = await _userManager.FindByEmailAsync(adminEmail);
             if (admin is null)
             {
                 admin = new ApplicationUser
                 {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    FullName = "Esraa Taha",
-                    EmailConfirmed = true
+                    UserName = "EsraaTaha",
+                    Email = adminEmail
                 };
 
-                var res = await _userManager.CreateAsync(admin, "HOHO123!");
+                var res = await _userManager.CreateAsync(admin, "HeHe2001");
 
                 if (!res.Succeeded)
                 {

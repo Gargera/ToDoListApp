@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using ToDoListApp.DAL.Entities;
+using ToDoListApp.DAL.Enums;
 
 namespace ToDoListApp.BLL.DTOs.ToDoItemDtos
 {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using ToDoListApp.DAL.Entities;
+using ToDoListApp.BLL.DTOs.CategoryDtos;
 using ToDoListApp.DAL.Enums;
 
 namespace ToDoListApp.BLL.DTOs.ToDoItemDtos
@@ -29,6 +26,6 @@ namespace ToDoListApp.BLL.DTOs.ToDoItemDtos
         public int CategoryId { get; set; }
 
         [ForeignKey(nameof(CategoryId))]
-        public Category Category { get; set; } = null!;
+        public GetCategoryDto Category { get; set; } = null!;
     }
 }

@@ -37,7 +37,7 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Implementation
             }
         }
 
-        public async Task<TEntity?> GetEntityByIdAsync(int id, Expression<Func<TEntity, object>>[] includes)
+        public async Task<TEntity?> GetEntityByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             try
             {

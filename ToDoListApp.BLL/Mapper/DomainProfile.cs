@@ -12,12 +12,10 @@ namespace ToDoListApp.BLL.Mapper
             CreateMap<ToDoItem, GetToDoItemDto>();
             CreateMap<CreateToDoItemDto, ToDoItem>();
             CreateMap<UpdateToDoItemDto, ToDoItem>();
-            CreateMap<List<ToDoItem>, List<GetToDoItemDto>>();
-
+            
             CreateMap<Category, GetCategoryDto>();
             CreateMap<CreateCategoryDto, Category>();
             CreateMap<UpdateCategoryDto, Category>();
-            CreateMap<List<Category>, List<GetCategoryDto>>();
         }
     }
 }

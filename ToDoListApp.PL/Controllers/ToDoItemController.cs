@@ -1,19 +1,39 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using ToDoListApp.BLL.Interfaces;
-using ToDoListApp.PL.Mapping;
-using ToDoListApp.PL.ViewModels.ToDoItemVms;
+using ToDoListApp.BLL.DTOs.ToDoItemDtos;
 
 namespace ToDoListApp.PL.Controllers
 {
-    [Authorize]
     public class ToDoItemController : Controller
     {
         private readonly IToDoItemService _toDoItemService;
 
-        public ToDoItemController(IToDoItemService toDoItemService)
+        private readonly ICategoryService _categoryService;
+
+        private readonly IMapper _mapper;
+
+        public ToDoItemController(IToDoItemService toDoItemService, ICategoryService categoryService, IMapper mapper)
         {
             _toDoItemService = toDoItemService;
+            _categoryService = categoryService;
+            _mapper = mapper;
+        }
+
+        public async Task<IActionResult> Index(int CategoryId)
+        {
+            try
+            {
+                var category = await _categoryService.GetCategoryDtoByIdAsync(CategoryId);
+                if(!category.IsSuccess) return NotFound(category.Message);
+
+                var allToDoItems = await _toDoItemService.GetAllToDoItemDtosByCategoryIdAsync(CategoryId);
+                if(!allToDoItems.IsSuccess) return NotFound(allToDoItems.Message);
+                
+                return View(allToDoItems);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -23,42 +43,95 @@ namespace ToDoListApp.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(CreateToDoItemVm createToDoItemVm)
+        public async Task<IActionResult> Create(CreateToDoItemVm createToDoItemVm)
         {
-            if (!ModelState.IsValid)
+            try
+            {
+                if (!ModelState.IsValid) return View(createToDoItemVm);
+
+                var category = await _categoryService.GetCategoryDtoByIdAsync(createToDoItemVm.CategoryId);
+                if (!category.IsSuccess) return NotFound(category.Message);
+
+                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(createToDoItemVm.Title, createToDoItemVm.CategoryId);
+                if (!titleUnique.IsSuccess)
+                {
+                    ModelState.AddModelError("Title", titleUnique.Message);
+                    return View(createToDoItemVm);
+                }
+
+                var toDoItem = _mapper.Map<CreateToDoItemDto>(createToDoItemVm);
+                var result = await _toDoItemService.CreateToDoItemDtoAsync(toDoItem);
+                if (!result.IsSuccess)
+                {
+                    ModelState.AddModelError("", result.Message);
+                    return View(createToDoItemVm);
+                }
+
+                return RedirectToAction("Index", createToDoItemVm.CategoryId);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
                 return View(createToDoItemVm);
-
-            _toDoItemService.CreateToDoItem(createToDoItemVm.EntityToCreateToDoItemDto());
-            return RedirectToAction("GetAll");
+            }
         }
 
-        public IActionResult GetAll()
+        public async Task<IActionResult> Delete(int id)
         {
-            var allToDoItems = _toDoItemService.GetAllToDoItemsDtos().Select(t => t.EntityToGetToDoItemVm());
-            return View(allToDoItems);
-        }
+            try
+            {
+                var toDoItem = await _toDoItemService.GetToDoItemDtoByIdAsync(id);
+                if (!toDoItem.IsSuccess) return NotFound(toDoItem.Message);
 
-        public IActionResult Delete(int id)
-        {
-            _toDoItemService.DeleteToDoItem(id);
+                var result = await _toDoItemService.DeleteToDoItemDtoAsync(id);
+                if (!result.IsSuccess) return NotFound(result.Message);
 
-            return RedirectToAction("GetAll");
+                return View("Index", toDoItem.Data.CategoryId);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        public IActionResult Update(int id)
+        public IActionResult Update()
         {
-            var updateToDoItemVm = _toDoItemService.GetToDoItemDtoById(id).EntityToUpdateToDoItemVm();
-
-            return View("Update", updateToDoItemVm);
+            return View("Update");
         }
 
         [HttpPost]
-        public IActionResult Update(UpdateToDoItemVm updateToDoItemVm)
+        public async Task<IActionResult> Update(UpdateToDoItemVm updateToDoItemVm)
         {
-            _toDoItemService.UpdateToDoItem(updateToDoItemVm.EntityToUpdateToDoItemDto());
+            try
+            {
+                if (!ModelState.IsValid) return View(updateToDoItemVm);
 
-            return RedirectToAction("GetAll");
+                var category = await _categoryService.GetCategoryDtoByIdAsync(updateToDoItemVm.CategoryId);
+                if (!category.IsSuccess) return NotFound(category.Message);
+
+                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(updateToDoItemVm.Title, updateToDoItemVm.CategoryId);
+                if (!titleUnique.IsSuccess)
+                {
+                    ModelState.AddModelError("Title", titleUnique.Message);
+                    return View(updateToDoItemVm);
+                }
+
+                var toDoItem = _mapper.Map<UpdateToDoItemDto>(updateToDoItemVm);
+                var result = await _toDoItemService.UpdateToDoItemDtoAsync(toDoItem);
+                if (!result.IsSuccess)
+                {
+                    ModelState.AddModelError("", result.Message);
+                    return View(updateToDoItemVm);
+                }
+
+                return RedirectToAction("Index", updateToDoItemVm.CategoryId);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(updateToDoItemVm);
+            }
         }
     }
 }

@@ -154,7 +154,7 @@
         </div>
 
         <div class="card-body">
-            <form asp-action="LogIn" asp-controller="Auth" method="post" id="loginForm">
+            <form asp-action="LogIn" asp-controller="Account" method="post" id="loginForm">
                 @Html.AntiForgeryToken()
 
                 @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
@@ -261,7 +261,7 @@
 
                 <p style="text-align:center; margin-top:16px; font-size:13px; color:#9ca3af;">
                     Don't have an account?
-                    <a asp-action="Register" asp-controller="Auth"
+                    <a asp-action="Index" asp-controller="Account"
                        style="color:#3b82f6; font-weight:600; text-decoration:none;"
                        onmouseover="this.style.textDecoration='underline'"
                        onmouseout="this.style.textDecoration='none'">Create one</a>

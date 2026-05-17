@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+using ToDoListApp.BLL.DTOs.ToDoItemDtos;
 using ToDoListApp.DAL.Entities;
 using ToDoListApp.DAL.Enums;
 
@@ -17,9 +15,8 @@ namespace ToDoListApp.BLL.DTOs.CategoryDtos
         [StringLength(50, MinimumLength = 3)]
         public string Name { get; set; } = null!;
 
-        [Required]
         [MaxLength(100)]
-        public string Description { get; set; } = null!;
+        public string? Description { get; set; } = null!;
 
         public bool IsSystem { get; set; } = false;
 
@@ -28,6 +25,6 @@ namespace ToDoListApp.BLL.DTOs.CategoryDtos
         [ForeignKey(nameof(UserId))]
         public ApplicationUser User { get; set; } = null!;
 
-        public ICollection<ToDoItem> ToDoItems { get; set; } = new List<ToDoItem>();
+        public List<GetToDoItemDto> ToDoItems { get; set; } = new List<GetToDoItemDto>();
     }
 }

@@ -18,11 +18,11 @@ namespace ToDoListApp.BLL.Services.Implementation
             _mapper = mapper;
         }
 
-        public async Task<ResponseResult<List<GetToDoItemDto>>> GetAllToDoItemsDtosAsync()
+        public async Task<ResponseResult<List<GetToDoItemDto>>> GetAllToDoItemDtosByCategoryIdAsync(int categoryId)
         {
             try
             {
-                var result = await _unitOfWork.ToDoItems.GetAllEntitiesAsync(null, t => t.Category);
+                var result = await _unitOfWork.ToDoItems.GetAllEntitiesAsync(t => t.CategoryId == categoryId, t => t.Category);
                 var mappedResult = _mapper.Map<List<GetToDoItemDto>>(result);
                 
                 return new ResponseResult<List<GetToDoItemDto>>
@@ -68,7 +68,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<CreateToDoItemDto>> CreateToDoItemAsync(CreateToDoItemDto createToDoItemDto)
+        public async Task<ResponseResult<CreateToDoItemDto>> CreateToDoItemDtoAsync(CreateToDoItemDto createToDoItemDto)
         {
             try
             {
@@ -85,13 +85,15 @@ namespace ToDoListApp.BLL.Services.Implementation
                         createToDoItemDto
                     );
                 }
-
-                return new ResponseResult<CreateToDoItemDto>
-                (
-                    false,
-                    "Failed to create the ToDoItem.",
-                    null
-                );
+                else
+                {
+                    return new ResponseResult<CreateToDoItemDto>
+                    (
+                        false,
+                        "Failed to create the ToDoItem.",
+                        null
+                    );
+                }
             }
             catch(Exception ex)
             {
@@ -104,7 +106,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<int>> DeleteToDoItemAsync(int id)
+        public async Task<ResponseResult<int>> DeleteToDoItemDtoAsync(int id)
         {
             try
             {
@@ -124,14 +126,25 @@ namespace ToDoListApp.BLL.Services.Implementation
                             id
                         );
                     }
+                    else
+                    {
+                        return new ResponseResult<int>
+                        (
+                            false,
+                            "Failed to delete the ToDoItem.",
+                            id
+                        );
+                    }
                 }
-
-                return new ResponseResult<int>
-                (
-                    false,
-                    "Failed to delete the ToDoItem.",
-                    id
-                );
+                else
+                {
+                    return new ResponseResult<int>
+                    (
+                        false,
+                        "ToDoItem not found.",
+                        id
+                    );
+                }
             }
             catch(Exception ex)
             {
@@ -144,7 +157,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<UpdateToDoItemDto>> UpdateToDoItemAsync(UpdateToDoItemDto updateToDoItemDto)
+        public async Task<ResponseResult<UpdateToDoItemDto>> UpdateToDoItemDtoAsync(UpdateToDoItemDto updateToDoItemDto)
         {
             try
             {
@@ -165,14 +178,26 @@ namespace ToDoListApp.BLL.Services.Implementation
                             updateToDoItemDto
                         );
                     }
+                    else
+                    {
+                        return new ResponseResult<UpdateToDoItemDto>
+                        (
+                            false,
+                            "Failed to update the ToDoItem.",
+                            null
+                        );
+                    }
                 }
-                
-                return new ResponseResult<UpdateToDoItemDto>
-                (
-                    false,
-                    "Failed to update the ToDoItem.",
-                    null
-                );
+                else
+                {
+
+                    return new ResponseResult<UpdateToDoItemDto>
+                    (
+                        false,
+                        "ToDoItem not found.",
+                        null
+                    );
+                }
             }
             catch(Exception ex ) 
             {
@@ -185,11 +210,11 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<bool>> CheckUniqueTitleAsync(string title)
+        public async Task<ResponseResult<bool>> CheckToDoItemUniqueTitleAsync(string title, int categoryId)
         {
             try
             {
-                var result = await _unitOfWork.ToDoItems.AnyAsync(t => t.Title == title);
+                var result = await _unitOfWork.ToDoItems.AnyAsync(t => t.Title == title && t.CategoryId == categoryId);
 
                 if(!result)
                 {
@@ -200,13 +225,15 @@ namespace ToDoListApp.BLL.Services.Implementation
                         true
                     );
                 }
-
-                return new ResponseResult<bool>
-                (
-                    false,
-                    "Title is not unique.",
-                    false
-                );
+                else
+                {
+                    return new ResponseResult<bool>
+                    (
+                        false,
+                        "A ToDoItem with this title already exists in the category.",
+                        false
+                    );
+                }
             }
             catch(Exception ex)
             {

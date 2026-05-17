@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ToDoListApp.DAL.Database
 {
-    public class ToDoListAppDbContext : IdentityDbContext<ApplicationUser>
+    public class ToDoListAppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public DbSet<ToDoItem> ToDoItems { get; set; }
 

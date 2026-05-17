@@ -18,11 +18,11 @@ namespace ToDoListApp.BLL.Services.Implementation
             _mapper = mapper;
         }
 
-        public async Task<ResponseResult<List<GetCategoryDto>>> GetAllCategoriesDtosAsync()
+        public async Task<ResponseResult<List<GetCategoryDto>>> GetAllCategoriesDtosByUserIdAsync(string userId)
         {
             try
             {
-                var result = await _unitOfWork.Categories.GetAllEntitiesAsync(null, t => t.ToDoItems, t => t.User);
+                var result = await _unitOfWork.Categories.GetAllEntitiesAsync(c => c.UserId == userId, t => t.ToDoItems, t => t.User);
                 var mappedResult = _mapper.Map<List<GetCategoryDto>>(result);
 
                 return new ResponseResult<List<GetCategoryDto>>
@@ -68,7 +68,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<CreateCategoryDto>> CreateCategoryAsync(CreateCategoryDto createCategoryDto)
+        public async Task<ResponseResult<CreateCategoryDto>> CreateCategoryDtoAsync(CreateCategoryDto createCategoryDto)
         {
             try
             {
@@ -78,20 +78,22 @@ namespace ToDoListApp.BLL.Services.Implementation
 
                 if (changes > 0)
                 {
-                    return new ResponseResult<CreateCategoryDto >
+                    return new ResponseResult<CreateCategoryDto>
                     (
                         true,
                         null,
                         createCategoryDto
                     );
                 }
-
-                return new ResponseResult<CreateCategoryDto>
-                (
+                else
+                {
+                    return new ResponseResult<CreateCategoryDto>
+                    (
                     false,
-                    "Failed to create the Category.",
+                    "An error occurred while creating the category.",
                     null
-                );
+                    );
+                }
             }
             catch (Exception ex)
             {
@@ -104,7 +106,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<int>> DeleteCategoryAsync(int id)
+        public async Task<ResponseResult<int>> DeleteCategoryDtoAsync(int id)
         {
             try
             {
@@ -124,14 +126,26 @@ namespace ToDoListApp.BLL.Services.Implementation
                             id
                         );
                     }
+                    else
+                    {
+                        return new ResponseResult<int>
+                        (
+                            false,
+                            "An error occurred while deleting the category.",
+                            id
+                        );
+                    }
+                }
+                else
+                {
+                    return new ResponseResult<int>
+                    (
+                    false,
+                    "Category not found.",
+                    id
+                    );
                 }
 
-                return new ResponseResult<int>
-                (
-                    false,
-                    "Failed to delete the Category.",
-                    id
-                );
             }
             catch (Exception ex)
             {
@@ -144,7 +158,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<UpdateCategoryDto>> UpdateCategoryAsync(UpdateCategoryDto updateCategoryDto)
+        public async Task<ResponseResult<UpdateCategoryDto>> UpdateCategoryDtoAsync(UpdateCategoryDto updateCategoryDto)
         {
             try
             {
@@ -164,14 +178,26 @@ namespace ToDoListApp.BLL.Services.Implementation
                             updateCategoryDto
                         );
                     }
+                    else
+                    {
+                        return new ResponseResult<UpdateCategoryDto>
+                        (
+                            false,
+                            "An error occurred while updating the category.",
+                            null
+                        );
+                    }
+                }
+                else
+                {
+                    return new ResponseResult<UpdateCategoryDto>
+                    (
+                        false,
+                        "Category not found.",
+                        null
+                    );
                 }
 
-                return new ResponseResult<UpdateCategoryDto>
-                (
-                    false,
-                    "Failed to update the Category.",
-                    null
-                );
             }
             catch (Exception ex)
             {
@@ -184,7 +210,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<bool>> CheckUniqueNameAsync(string name)
+        public async Task<ResponseResult<bool>> CheckCategoryUniqueNameAsync(string name)
         {
             try
             {
@@ -199,13 +225,15 @@ namespace ToDoListApp.BLL.Services.Implementation
                         true
                     );
                 }
-
-                return new ResponseResult<bool>
-                (
-                    false,
-                    "Name is not unique.",
-                    false
-                );
+                else
+                {
+                    return new ResponseResult<bool>
+                    (
+                        false,
+                        "A category with this name already exists.",
+                        false
+                    );
+                }
             }
             catch (Exception ex)
             {
@@ -214,6 +242,48 @@ namespace ToDoListApp.BLL.Services.Implementation
                     false,
                     ex.Message,
                     false
+                );
+            }
+        }
+
+        public async Task<ResponseResult<string>> CreateDefaultCategoryAsync(string UserId)
+        {
+            try
+            {
+                var defaultCategory = new Category
+                {
+                    Name = "General",
+                    UserId = UserId,
+                    IsSystem = true
+                };
+                await _unitOfWork.Categories.AddEntityAsync(defaultCategory);
+                var changes = await _unitOfWork.SaveChangesAsync();
+                if (changes > 0)
+                {
+                    return new ResponseResult<string>
+                    (
+                        true,
+                        null,
+                        "Default category created successfully."
+                    );
+                }
+                else
+                {
+                    return new ResponseResult<string>
+                    (
+                        false,
+                        "Failed to create the default category.",
+                        null
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<string>
+                (
+                    false,
+                    ex.Message,
+                    null
                 );
             }
         }

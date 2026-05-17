@@ -1,6 +1,6 @@
 ﻿namespace ToDoListApp.PL.ViewModels.HomeVms
 {
-    public class HomeIndexVm
+    public class HomeVm
     {
         public int TotalTasks { get; set; }
         public int CompletedTasks { get; set; }

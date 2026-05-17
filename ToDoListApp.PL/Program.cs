@@ -47,6 +47,7 @@ namespace ToDoListApp.PL
 
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ToDoListAppDbContext>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
