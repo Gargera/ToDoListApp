@@ -116,7 +116,6 @@ namespace ToDoListApp.PL.Controllers
         {
             try
             {
-
                 var toDoItem = await _toDoItemService.GetToDoItemDtoByIdAsync(id);
                 if (!toDoItem.IsSuccess) return NotFound(toDoItem.Message);
 
