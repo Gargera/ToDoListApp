@@ -3,6 +3,7 @@ using ToDoListApp.BLL.DTOs.ToDoItemDtos;
 
 namespace ToDoListApp.PL.Controllers
 {
+    [Authorize(Roles = "Admin, User")]
     public class ToDoItemController : Controller
     {
         private readonly IToDoItemService _toDoItemService;
@@ -27,8 +28,12 @@ namespace ToDoListApp.PL.Controllers
 
                 var allToDoItems = await _toDoItemService.GetAllToDoItemDtosByCategoryIdAsync(CategoryId);
                 if(!allToDoItems.IsSuccess) return NotFound(allToDoItems.Message);
-                
-                return View(allToDoItems);
+
+                var mappedCategory = _mapper.Map<GetCategoryVm>(category.Data);
+                ViewBag.Category = mappedCategory;
+
+                var mappedToDoItems = _mapper.Map<List<GetToDoItemVm>>(allToDoItems.Data);
+                return View(mappedToDoItems);
             }
             catch (Exception ex)
             {
@@ -37,9 +42,21 @@ namespace ToDoListApp.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int CategoryId)
         {
-            return View();
+            try
+            {
+                var category = await _categoryService.GetCategoryDtoByIdAsync(CategoryId);
+                if (!category.IsSuccess) return NotFound(category.Message);
+
+                var vm = new CreateToDoItemVm { CategoryId = CategoryId };
+
+                return View(vm);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -52,7 +69,7 @@ namespace ToDoListApp.PL.Controllers
                 var category = await _categoryService.GetCategoryDtoByIdAsync(createToDoItemVm.CategoryId);
                 if (!category.IsSuccess) return NotFound(category.Message);
 
-                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(createToDoItemVm.Title, createToDoItemVm.CategoryId);
+                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(t => t.Title == createToDoItemVm.Title && t.CategoryId == createToDoItemVm.CategoryId);
                 if (!titleUnique.IsSuccess)
                 {
                     ModelState.AddModelError("Title", titleUnique.Message);
@@ -67,7 +84,7 @@ namespace ToDoListApp.PL.Controllers
                     return View(createToDoItemVm);
                 }
 
-                return RedirectToAction("Index", createToDoItemVm.CategoryId);
+                return RedirectToAction("Index", new { CategoryId = createToDoItemVm.CategoryId });
             }
             catch (Exception ex)
             {
@@ -86,7 +103,7 @@ namespace ToDoListApp.PL.Controllers
                 var result = await _toDoItemService.DeleteToDoItemDtoAsync(id);
                 if (!result.IsSuccess) return NotFound(result.Message);
 
-                return View("Index", toDoItem.Data.CategoryId);
+                return RedirectToAction("Index", new { CategoryId = toDoItem.Data.CategoryId });
             }
             catch(Exception ex)
             {
@@ -95,9 +112,21 @@ namespace ToDoListApp.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Update()
+        public async Task<IActionResult> Update(int id)
         {
-            return View("Update");
+            try
+            {
+
+                var toDoItem = await _toDoItemService.GetToDoItemDtoByIdAsync(id);
+                if (!toDoItem.IsSuccess) return NotFound(toDoItem.Message);
+
+                var vm = _mapper.Map<UpdateToDoItemVm>(toDoItem.Data);
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -110,7 +139,7 @@ namespace ToDoListApp.PL.Controllers
                 var category = await _categoryService.GetCategoryDtoByIdAsync(updateToDoItemVm.CategoryId);
                 if (!category.IsSuccess) return NotFound(category.Message);
 
-                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(updateToDoItemVm.Title, updateToDoItemVm.CategoryId);
+                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(t => t.Title == updateToDoItemVm.Title && t.CategoryId == updateToDoItemVm.CategoryId && t.Id != updateToDoItemVm.Id);
                 if (!titleUnique.IsSuccess)
                 {
                     ModelState.AddModelError("Title", titleUnique.Message);
@@ -125,7 +154,7 @@ namespace ToDoListApp.PL.Controllers
                     return View(updateToDoItemVm);
                 }
 
-                return RedirectToAction("Index", updateToDoItemVm.CategoryId);
+                return RedirectToAction("Index", new { CategoryId = updateToDoItemVm.CategoryId });
             }
             catch (Exception ex)
             {

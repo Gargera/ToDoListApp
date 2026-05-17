@@ -31,7 +31,7 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Implementation
 
                 return await query.ToListAsync();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -50,7 +50,7 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Implementation
 
                 return await query.FirstOrDefaultAsync(e => e.Id == id);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -62,7 +62,7 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Implementation
             {
                 await _dbContext.Set<TEntity>().AddAsync(entity);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -98,6 +98,25 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Implementation
             try
             {
                 return await _dbContext.Set<TEntity>().AnyAsync(predicate);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null)
+        {
+            try
+            {
+                if (predicate is not null)
+                {
+                    return await _dbContext.Set<TEntity>().CountAsync(predicate);
+                }
+                else
+                {
+                    return await _dbContext.Set<TEntity>().CountAsync();
+                }
             }
             catch
             {

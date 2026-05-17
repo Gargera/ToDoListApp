@@ -7,7 +7,6 @@ namespace ToDoListApp.PL.ViewModels.ToDoItemVms
 {
     public class UpdateToDoItemVm
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Title is required.")]
@@ -18,7 +17,6 @@ namespace ToDoListApp.PL.ViewModels.ToDoItemVms
         public string? Description { get; set; }
 
         public bool IsCompleted { get; set; }
-        public DateTime CreatedDate { get; set; }
 
         [EnumDataType(typeof(Priority))]
         public Priority Priority { get; set; }

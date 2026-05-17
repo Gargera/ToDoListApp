@@ -8,9 +8,6 @@ namespace ToDoListApp.DAL.Configuration
         {
             builder.HasKey(c => c.Id);
 
-            builder.HasIndex(c => c.Name)
-                   .IsUnique();
-
             builder.Property(c => c.Description)
                    .HasMaxLength(200);
 

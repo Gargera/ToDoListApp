@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
+using System.Linq.Expressions;
 using ToDoListApp.BLL.Common;
 using ToDoListApp.BLL.DTOs.CategoryDtos;
+using ToDoListApp.BLL.Services.Abstraction;
 using ToDoListApp.DAL.Entities;
 using ToDoListApp.DAL.Repositories.UnitOfWorkPattern.Abstraction;
-using ToDoListApp.BLL.Services.Abstraction;
 
 namespace ToDoListApp.BLL.Services.Implementation
 {
@@ -210,11 +211,11 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<bool>> CheckCategoryUniqueNameAsync(string name)
+        public async Task<ResponseResult<bool>> CheckCategoryUniqueNameAsync(Expression<Func<Category, bool>> predicate)
         {
             try
             {
-                var result = await _unitOfWork.Categories.AnyAsync(t => t.Name == name);
+                var result = await _unitOfWork.Categories.AnyAsync(predicate);
 
                 if (!result)
                 {

@@ -5,7 +5,6 @@ namespace ToDoListApp.PL.ViewModels.CategoryVms
 {
     public class UpdateCategoryVm
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
@@ -16,7 +15,5 @@ namespace ToDoListApp.PL.ViewModels.CategoryVms
         public string? Description { get; set; }
 
         public bool IsSystem { get; set; } = false;
-
-        public string UserId { get; set; } = null!;
     }
 }

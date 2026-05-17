@@ -15,5 +15,7 @@ namespace ToDoListApp.DAL.Repositories.GenericRepository.Abstraction
         public Task DeleteEntityAsync(int id);
 
         public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
+
+        public Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null);
     }
 }

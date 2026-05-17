@@ -13,8 +13,7 @@ namespace ToDoListApp.PL.ViewModels.ToDoItemVms
         public string? Description { get; set; }
 
         public bool IsCompleted { get; set; } = false;
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-
+        
         [EnumDataType(typeof(Priority))]
         public Priority Priority { get; set; } = Priority.High;
 

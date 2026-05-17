@@ -20,8 +20,9 @@ namespace ToDoListApp.PL.Mapper
                 CreateMap<GetToDoItemDto, GetToDoItemVm>().ReverseMap();
                 CreateMap<CreateToDoItemDto, CreateToDoItemVm>().ReverseMap();
                 CreateMap<UpdateToDoItemDto, UpdateToDoItemVm>().ReverseMap();
+                CreateMap<GetToDoItemDto, UpdateToDoItemVm>().ReverseMap();
 
-                CreateMap<CreateUserVm, ApplicationUser>().ReverseMap();
+            CreateMap<CreateUserVm, ApplicationUser>().ReverseMap();
             }
         }
 }

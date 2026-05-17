@@ -113,6 +113,7 @@ namespace ToDoListApp.PL.Controllers
             }
         }
 
+        [HttpPost]
         public async Task<IActionResult> LogOut()
         {
             try

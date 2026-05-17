@@ -3,6 +3,7 @@ using ToDoListApp.DAL.Entities;
 using ToDoListApp.BLL.Common;
 using ToDoListApp.BLL.DTOs.ToDoItemDtos;
 using ToDoListApp.BLL.Services.Abstraction;
+using System.Linq.Expressions;
 using ToDoListApp.DAL.Repositories.UnitOfWorkPattern.Abstraction;
 
 namespace ToDoListApp.BLL.Services.Implementation
@@ -24,7 +25,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             {
                 var result = await _unitOfWork.ToDoItems.GetAllEntitiesAsync(t => t.CategoryId == categoryId, t => t.Category);
                 var mappedResult = _mapper.Map<List<GetToDoItemDto>>(result);
-                
+
                 return new ResponseResult<List<GetToDoItemDto>>
                 (
                     true,
@@ -32,7 +33,7 @@ namespace ToDoListApp.BLL.Services.Implementation
                     mappedResult
                 );
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new ResponseResult<List<GetToDoItemDto>>
                 (
@@ -49,7 +50,7 @@ namespace ToDoListApp.BLL.Services.Implementation
             {
                 var result = await _unitOfWork.ToDoItems.GetEntityByIdAsync(id, t => t.Category);
                 var mappedResult = _mapper.Map<GetToDoItemDto>(result);
-                
+
                 return new ResponseResult<GetToDoItemDto>
                 (
                     true,
@@ -75,8 +76,8 @@ namespace ToDoListApp.BLL.Services.Implementation
                 var mappedResult = _mapper.Map<ToDoItem>(createToDoItemDto);
                 await _unitOfWork.ToDoItems.AddEntityAsync(mappedResult);
                 var changes = await _unitOfWork.SaveChangesAsync();
-                
-                if(changes > 0)
+
+                if (changes > 0)
                 {
                     return new ResponseResult<CreateToDoItemDto>
                     (
@@ -95,7 +96,7 @@ namespace ToDoListApp.BLL.Services.Implementation
                     );
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new ResponseResult<CreateToDoItemDto>
                 (
@@ -112,12 +113,12 @@ namespace ToDoListApp.BLL.Services.Implementation
             {
                 var result = await _unitOfWork.ToDoItems.GetEntityByIdAsync(id);
 
-                if(result != null)
+                if (result != null)
                 {
                     await _unitOfWork.ToDoItems.DeleteEntityAsync(id);
                     var changes = await _unitOfWork.SaveChangesAsync();
 
-                    if(changes > 0)
+                    if (changes > 0)
                     {
                         return new ResponseResult<int>
                         (
@@ -146,7 +147,7 @@ namespace ToDoListApp.BLL.Services.Implementation
                     );
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new ResponseResult<int>
                 (
@@ -166,10 +167,12 @@ namespace ToDoListApp.BLL.Services.Implementation
                 if (result != null)
                 {
                     var mappedResult = _mapper.Map<ToDoItem>(updateToDoItemDto);
+                    mappedResult.CreatedDate = result.CreatedDate;
+
                     _unitOfWork.ToDoItems.UpdateEntity(mappedResult);
                     var changes = await _unitOfWork.SaveChangesAsync();
 
-                    if(changes > 0)
+                    if (changes > 0)
                     {
                         return new ResponseResult<UpdateToDoItemDto>
                         (
@@ -199,7 +202,7 @@ namespace ToDoListApp.BLL.Services.Implementation
                     );
                 }
             }
-            catch(Exception ex ) 
+            catch (Exception ex)
             {
                 return new ResponseResult<UpdateToDoItemDto>
                 (
@@ -210,13 +213,13 @@ namespace ToDoListApp.BLL.Services.Implementation
             }
         }
 
-        public async Task<ResponseResult<bool>> CheckToDoItemUniqueTitleAsync(string title, int categoryId)
+        public async Task<ResponseResult<bool>> CheckToDoItemUniqueTitleAsync(Expression<Func<ToDoItem, bool>> predicate)
         {
             try
             {
-                var result = await _unitOfWork.ToDoItems.AnyAsync(t => t.Title == title && t.CategoryId == categoryId);
+                var result = await _unitOfWork.ToDoItems.AnyAsync(predicate);
 
-                if(!result)
+                if (!result)
                 {
                     return new ResponseResult<bool>
                     (
@@ -235,13 +238,59 @@ namespace ToDoListApp.BLL.Services.Implementation
                     );
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new ResponseResult<bool>
                 (
                     false,
                     ex.Message,
                     false
+                );
+            }
+        }
+
+        public async Task<ResponseResult<int>> CountByUserIdAsync(string userId)
+        {
+            try
+            {
+                var result = await _unitOfWork.ToDoItems.CountAsync(t => t.Category.UserId == userId);
+                return new ResponseResult<int>
+                (
+                    true,
+                    null,
+                    result
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<int>
+                (
+                    false,
+                    ex.Message,
+                    0
+                );
+            }
+        }
+
+        public async Task<ResponseResult<int>> CountCompletedByUserIdAsync(string userId)
+        {
+            try
+            {
+                var result = await _unitOfWork.ToDoItems.CountAsync(t => t.Category.UserId == userId && t.IsCompleted);
+                return new ResponseResult<int>
+                (
+                    true,
+                    null,
+                    result
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<int>
+                (
+                    false,
+                    ex.Message,
+                    0
                 );
             }
         }

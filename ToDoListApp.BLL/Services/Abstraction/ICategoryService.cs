@@ -1,4 +1,5 @@
-﻿using ToDoListApp.BLL.Common;
+﻿using System.Linq.Expressions;
+using ToDoListApp.BLL.Common;
 using ToDoListApp.BLL.DTOs.CategoryDtos;
 using ToDoListApp.DAL.Entities;
 
@@ -18,6 +19,6 @@ namespace ToDoListApp.BLL.Services.Abstraction
 
         public Task<ResponseResult<UpdateCategoryDto>> UpdateCategoryDtoAsync(UpdateCategoryDto updateCategoryDto);
 
-        public Task<ResponseResult<bool>> CheckCategoryUniqueNameAsync(string name);
+        public Task<ResponseResult<bool>> CheckCategoryUniqueNameAsync(Expression<Func<Category, bool>> predicate);
     }
 }

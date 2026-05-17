@@ -2,7 +2,7 @@
 
 namespace ToDoListApp.PL.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "Admin, User")]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -23,7 +23,7 @@ namespace ToDoListApp.PL.Controllers
             try
             {
                 var userId = _userManager.GetUserId(User);
-                if(userId == null) return NotFound("User not found");
+                if(userId == null) return Forbid("You are not authorized to view categories.");
 
                 var getCategories = await _categoryService.GetAllCategoriesDtosByUserIdAsync(userId);
                 if (!getCategories.IsSuccess) return BadRequest(getCategories.Message);
@@ -50,18 +50,18 @@ namespace ToDoListApp.PL.Controllers
             {
                 if (!ModelState.IsValid) return View(createCategoryVm);
 
-                var checkUniqueName = await _categoryService.CheckCategoryUniqueNameAsync(createCategoryVm.Name);
+                var userId = _userManager.GetUserId(User);
+                if (userId == null) return Forbid("You are not authorized to create category.");
+
+                var checkUniqueName = await _categoryService.CheckCategoryUniqueNameAsync(c => c.Name == createCategoryVm.Name && c.UserId == userId);
                 if (!checkUniqueName.IsSuccess)
                 {
                     ModelState.AddModelError("Name", checkUniqueName.Message);
                     return View(createCategoryVm);
                 }
 
-                var userId = _userManager.GetUserId(User);
-                if (userId == null) return NotFound("User not found");
-                createCategoryVm.UserId = userId;
-
                 var mappedResult = _mapper.Map<CreateCategoryDto>(createCategoryVm);
+                mappedResult.UserId = userId;
                 var result = await _categoryService.CreateCategoryDtoAsync(mappedResult);
                 if (!result.IsSuccess)
                 {
@@ -79,9 +79,20 @@ namespace ToDoListApp.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Update()
+        public async Task<IActionResult> Update(int id)
         {
-            return View();
+            try
+            {
+                var category = await _categoryService.GetCategoryDtoByIdAsync(id);
+                if (!category.IsSuccess) return NotFound(category.Message);
+
+                var vm = _mapper.Map<UpdateCategoryVm>(category.Data);
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -89,9 +100,20 @@ namespace ToDoListApp.PL.Controllers
         {
             try
             {
+                var userId = _userManager.GetUserId(User);
+                if(userId == null) return Forbid("You are not authorized to update this category.");
+
                 if (!ModelState.IsValid) return View(updateCategoryVm);
 
+                var checkUniqueName = await _categoryService.CheckCategoryUniqueNameAsync(c => c.Name == updateCategoryVm.Name && c.UserId == userId);
+                if (!checkUniqueName.IsSuccess)
+                {
+                    ModelState.AddModelError("Name", checkUniqueName.Message);
+                    return View(updateCategoryVm);
+                }
+
                 var mappedResult = _mapper.Map<UpdateCategoryDto>(updateCategoryVm);
+                mappedResult.UserId = userId;
                 var result = await _categoryService.UpdateCategoryDtoAsync(mappedResult);
                 if (!result.IsSuccess)
                 {
@@ -112,6 +134,12 @@ namespace ToDoListApp.PL.Controllers
         {
             try
             {
+                var category = await _categoryService.GetCategoryDtoByIdAsync(categoryId);
+                if(!category.IsSuccess) return NotFound(category.Message);
+
+                var userId = _userManager.GetUserId(User);
+                if (userId != category.Data.UserId) return Forbid("You are not authorized to update this category.");
+
                 var result = await _categoryService.DeleteCategoryDtoAsync(categoryId);
                 if (!result.IsSuccess)
                 {

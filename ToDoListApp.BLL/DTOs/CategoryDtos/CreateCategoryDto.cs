@@ -10,11 +10,8 @@ namespace ToDoListApp.BLL.DTOs.CategoryDtos
 {
     public class CreateCategoryDto
     {
-        [Required]
-        [StringLength(50, MinimumLength = 3)]
         public string Name { get; set; } = null!;
 
-        [MaxLength(100)]
         public string? Description { get; set; } = null!;
 
         public bool IsSystem { get; set; } = false;

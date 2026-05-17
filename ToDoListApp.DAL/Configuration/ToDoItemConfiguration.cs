@@ -12,9 +12,6 @@ namespace ToDoListApp.DAL.Configuration
                    .IsRequired()
                    .HasMaxLength(50);
 
-            builder.HasIndex(c => c.Title)
-                   .IsUnique();
-
             builder.Property(t => t.Description)
                    .HasMaxLength(400);
 
