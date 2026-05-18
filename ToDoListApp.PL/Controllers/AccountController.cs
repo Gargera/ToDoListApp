@@ -84,8 +84,7 @@ namespace ToDoListApp.PL.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return View(logInUserVm);
+                if (!ModelState.IsValid) return View(logInUserVm);
 
                 var user = await _userManager.FindByNameAsync(logInUserVm.UserName);
                 if (user == null)

@@ -1,0 +1,866 @@
+﻿@model IEnumerable<GetToDoItemVm>
+
+@{
+    ViewData["Title"] = "My Tasks";
+    var items = Model?.ToList() ?? new List<ToDoListApp.PL.ViewModels.ToDoItemVms.GetToDoItemVm>();
+    var total = items.Count;
+    var completed = items.Count(x => x.IsCompleted);
+    var pending = total - completed;
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: linear-gradient(135deg, #e8f4fd 0%, #f0f4f8 50%, #fef9f0 100%);
+    min-height: 100vh;
+    }
+
+    .page-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 16px 60px;
+    }
+
+    .page-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 30px rgba(59,130,246,0.25);
+    animation: fadeUp 0.4s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    .stat-chip {
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    min-width: 90px;
+    }
+
+    .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    animation: fadeUp 0.4s 0.08s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    }
+
+    .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+    }
+
+    .search-input {
+    width: 100%;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px 10px 40px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: all 0.2s;
+    }
+
+    .search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .search-input::placeholder {
+    color: #d1d5db;
+    }
+
+    .filter-btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+    border-color: #d1d5db;
+    color: #374151;
+    }
+
+    .filter-btn.active {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .btn-new {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    white-space: nowrap;
+    }
+
+    .btn-new:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(59,130,246,0.4);
+    }
+
+    .task-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid #f3f4f6;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: all 0.2s;
+    animation: fadeUp 0.4s cubic-bezier(.16,1,.3,1) both;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+    }
+
+    .task-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    }
+
+    .task-card.priority-low::before {
+    background: #10b981;
+    }
+
+    .task-card.priority-medium::before {
+    background: #f59e0b;
+    }
+
+    .task-card.priority-high::before {
+    background: #ef4444;
+    }
+
+    .task-card:hover {
+    border-color: #e5e7eb;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+    }
+
+    .task-card.completed {
+    opacity: 0.6;
+    }
+
+    .task-card.completed .task-title {
+    text-decoration: line-through;
+    color: #9ca3af;
+    }
+
+    .check-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: #fff;
+    }
+
+    .check-circle.done {
+    background: #10b981;
+    border-color: #10b981;
+    }
+
+    .priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    }
+
+    .badge-low {
+    background: #ecfdf5;
+    color: #065f46;
+    }
+
+    .badge-medium {
+    background: #fffbeb;
+    color: #78350f;
+    }
+
+    .badge-high {
+    background: #fef2f2;
+    color: #7f1d1d;
+    }
+
+    .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    }
+
+    .badge-done {
+    background: #ecfdf5;
+    color: #065f46;
+    }
+
+    .badge-pending {
+    background: #f3f4f6;
+    color: #6b7280;
+    }
+
+    .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1.5px solid #e5e7eb;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s;
+    color: #6b7280;
+    flex-shrink: 0;
+    }
+
+    .action-btn:hover {
+    border-color: #d1d5db;
+    color: #374151;
+    background: #f3f4f6;
+    }
+
+    .action-btn.delete:hover {
+    border-color: #fca5a5;
+    color: #ef4444;
+    background: #fef2f2;
+    }
+
+    .action-btn.edit:hover {
+    border-color: #93c5fd;
+    color: #3b82f6;
+    background: #eff6ff;
+    }
+
+    .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px dashed #e5e7eb;
+    }
+
+    @@keyframes fadeUp {
+    from {
+    opacity: 0;
+    transform: translateY(14px);
+    }
+
+    to {
+    opacity: 1;
+    transform: translateY(0);
+    }
+    }
+
+    .task-card.hidden-filter {
+    display: none;
+    }
+
+
+    .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .modal-overlay.open {
+    display: flex;
+    }
+
+    .modal-box {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px;
+    width: 100%;
+    max-width: 380px;
+    margin: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: modalIn 0.25s cubic-bezier(.16,1,.3,1);
+    }
+
+    @@keyframes modalIn {
+    from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+    }
+
+    to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    }
+    }
+
+    .modal-icon {
+    width: 52px;
+    height: 52px;
+    background: #fef2f2;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    }
+
+    .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
+    margin: 0 0 6px;
+    }
+
+    .modal-desc {
+    font-size: 13px;
+    color: #6b7280;
+    text-align: center;
+    margin: 0 0 24px;
+    line-height: 1.5;
+    }
+
+    .modal-actions {
+    display: flex;
+    gap: 10px;
+    }
+
+    .modal-cancel {
+    flex: 1;
+    padding: 11px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.18s;
+    }
+
+    .modal-cancel:hover {
+    border-color: #d1d5db;
+    color: #374151;
+    background: #f9fafb;
+    }
+
+    .modal-confirm-delete {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+    }
+
+    .modal-confirm-delete:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(239,68,68,0.4);
+    }
+
+    @@media (max-width: 600px) {
+    .stat-chip {
+    min-width: 70px;
+    padding: 10px 12px;
+    }
+
+    .page-header {
+    padding: 22px;
+    }
+    }
+
+    .action-btn.view-details:hover {
+    border-color: #a5b4fc;
+    color: #6366f1;
+    background: #eef2ff;
+    }
+
+    .sort-select {
+    padding: 10px 36px 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+    transition: all 0.18s;
+    white-space: nowrap;
+    }
+
+    .sort-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    color: #374151;
+    }
+</style>
+
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                 fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                <path d="M10 11v6"></path>
+                <path d="M14 11v6"></path>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+            </svg>
+        </div>
+        <p class="modal-title">Delete Task?</p>
+        <p class="modal-desc">This action cannot be undone. The task will be permanently removed.</p>
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <button class="modal-confirm-delete" id="modalConfirmBtn" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal-box" style="max-width:440px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:38px; height:38px; background:#eef2ff; border-radius:10px;
+                    display:flex; align-items:center; justify-content:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                         fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                </div>
+                <span style="font-size:13px; font-weight:700; color:#6366f1; text-transform:uppercase;
+                letter-spacing:0.05em;">Task Details</span>
+            </div>
+            <button onclick="closeDetailsModal()"
+                    style="width:30px; height:30px; border-radius:8px; border:1.5px solid #e5e7eb;
+                background:#fafafa; cursor:pointer; display:flex; align-items:center;
+                justify-content:center; color:#9ca3af; transition:all 0.18s;"
+                    onmouseover="this.style.background='#f3f4f6';this.style.color='#374151';"
+                    onmouseout="this.style.background='#fafafa';this.style.color='#9ca3af';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div style="margin-bottom:14px;">
+            <p style="font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase;
+            letter-spacing:0.06em; margin:0 0 6px;">Title</p>
+            <p id="detailsTitle" style="font-size:16px; font-weight:600; color:#111827; margin:0; line-height:1.4;"></p>
+        </div>
+
+        <div>
+            <p style="font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase;
+            letter-spacing:0.06em; margin:0 0 6px;">Description</p>
+            <p id="detailsDesc" style="font-size:14px; color:#6b7280; margin:0; line-height:1.6;"></p>
+        </div>
+
+        <div style="margin-top:24px;">
+            <button onclick="closeDetailsModal()" class="modal-cancel" style="width:100%;">Close</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="page-wrap">
+
+    <div class="page-header">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+            <div>
+                <h1 style="font-size:24px; font-weight:700; color:#fff; margin:0;">All My Tasks</h1>
+                <p style="color:rgba(255,255,255,0.75); font-size:13px; margin-top:4px;">
+                    All tasks across all your categories
+                </p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="stat-chip">
+                    <div style="font-size:22px; font-weight:700; color:#fff;">@total</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">Total</div>
+                </div>
+                <div class="stat-chip">
+                    <div style="font-size:22px; font-weight:700; color:#fff;">@pending</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">Pending</div>
+                </div>
+                <div class="stat-chip">
+                    <div style="font-size:22px; font-weight:700; color:#fff;">@completed</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">Done</div>
+                </div>
+            </div>
+        </div>
+
+        @if (total > 0)
+        {
+            var pct = (int)Math.Round((double)completed / total * 100);
+            <div style="margin-top:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-size:12px; color:rgba(255,255,255,0.7);">Progress</span>
+                    <span style="font-size:12px; font-weight:600; color:#fff;">@pct%</span>
+                </div>
+                <div style="background:rgba(255,255,255,0.2); border-radius:999px; height:6px;">
+                    <div style="background:#fff; border-radius:999px; height:6px; width:@(pct)%; transition:width 0.6s ease;"></div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <span class="search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." />
+        </div>
+
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" data-filter="pending" onclick="setFilter('pending',this)">Pending</button>
+        <button class="filter-btn" data-filter="done" onclick="setFilter('done',this)">Done</button>
+
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+            <option value="">Sort by...</option>
+            <option value="priority-asc">Priority: High &#8594; Low</option>
+            <option value="priority-desc">Priority: Low &#8594; High</option>
+            <option value="title-asc">Title: A &#8594; Z</option>
+            <option value="title-desc">Title: Z &#8594; A</option>
+        </select>
+    </div>
+
+    <div id="taskList">
+        @if (!items.Any())
+        {
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                     fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                     style="margin:0 auto 16px;">
+                    <path d="M9 11l3 3L22 4"></path>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <p style="font-size:16px; font-weight:600; color:#374151; margin:0;">No tasks yet</p>
+                <p style="font-size:13px; color:#9ca3af; margin-top:6px;">Go to a category and create your first task</p>
+                <a asp-action="Index" asp-controller="Category" class="btn-new"
+                   style="margin-top:20px; display:inline-flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Go to Categories
+                </a>
+            </div>
+        }
+        else
+        {
+            var delay = 0;
+            foreach (var item in items)
+            {
+                var priorityClass = item.Priority switch
+                {
+                    Priority.Low => "priority-low",
+                    Priority.Medium => "priority-medium",
+                    Priority.High => "priority-high",
+                    _ => "priority-medium"
+                };
+                var badgeClass = item.Priority switch
+                {
+                    Priority.Low => "badge-low",
+                    Priority.Medium => "badge-medium",
+                    Priority.High => "badge-high",
+                    _ => "badge-medium"
+                };
+                var priorityLabel = item.Priority.ToString();
+                var doneClass = item.IsCompleted ? "completed" : "";
+                var filterAttr = item.IsCompleted ? "done" : "pending";
+
+                <div class="task-card @priorityClass @doneClass"
+                     data-status="@filterAttr"
+                     data-title="@item.Title.ToLower()"
+                     data-priority="@((int)item.Priority)"
+                     style="animation-delay:@(delay * 0.05)s;">
+
+                    <div class="check-circle @(item.IsCompleted ? "done" : "")">
+                        @if (item.IsCompleted)
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                 fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        }
+                    </div>
+
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                            <div>
+                                <p class="task-title"
+                                   style="font-size:15px; font-weight:600; color:#111827; margin:0; line-height:1.4;">
+                                    @item.Title
+                                </p>
+                                @if (!string.IsNullOrEmpty(item.Description))
+                                {
+                                    <p style="font-size:13px; color:#6b7280; margin:4px 0 0; line-height:1.5;">
+                                        @item.Description
+                                    </p>
+                                }
+                            </div>
+
+                            <div style="display:flex; gap:6px; flex-shrink:0;">
+                                <button class="action-btn view-details" title="View Details"
+                                        onclick="openDetailsModal('@item.Title', '@Html.Raw(item.Description?.Replace("'", "\\'") ?? "")')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                            <span class="priority-badge @badgeClass">
+                                @if (item.Priority == Priority.Low)
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <polyline points="19 12 12 19 5 12"></polyline>
+                                    </svg>
+                                }
+                                else if (item.Priority == Priority.High)
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                                        <polyline points="5 12 12 5 19 12"></polyline>
+                                    </svg>
+                                }
+                                else
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                }
+                                @priorityLabel
+                            </span>
+
+                            <span class="status-badge @(item.IsCompleted ? "badge-done" : "badge-pending")">
+                                @(item.IsCompleted ? "Completed" : "Pending")
+                            </span>
+
+                            @if (item.Category != null)
+                            {
+                                <span style="font-size:11px; font-weight:600; color:#6366f1;
+                                    background:#eef2ff; padding:3px 10px; border-radius:6px;
+                                    display:inline-flex; align-items:center; gap:4px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    @item.Category.Name
+                                </span>
+                            }
+
+                            <span style="font-size:11px; color:#9ca3af; display:flex; align-items:center; gap:4px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                @item.CreatedDate.ToString("MMM dd, yyyy")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                delay++;
+            }
+        }
+    </div>
+
+    <div id="noResults" style="display:none;">
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                 style="margin:0 auto 14px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <p style="font-size:15px; font-weight:600; color:#374151; margin:0;">No tasks found</p>
+            <p style="font-size:13px; color:#9ca3af; margin-top:6px;">Try a different search or filter</p>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function openDetailsModal(title, description) {
+        document.getElementById('detailsTitle').textContent = title;
+        document.getElementById('detailsDesc').textContent = description || 'No description provided.';
+        document.getElementById('detailsModal').classList.add('open');
+        }
+
+        function closeDetailsModal() {
+        document.getElementById('detailsModal').classList.remove('open');
+        }
+
+        document.getElementById('detailsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDetailsModal();
+        });
+
+        let currentFilter = 'all';
+        let pendingDeleteUrl = '';
+
+        function openDeleteModal(url) {
+        pendingDeleteUrl = url;
+        document.getElementById('deleteModal').classList.add('open');
+        }
+
+        function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('open');
+        pendingDeleteUrl = '';
+        }
+
+        function confirmDelete() {
+        if (pendingDeleteUrl) {
+        window.location.href = pendingDeleteUrl;
+        }
+        }
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+        });
+
+
+        document.getElementById('searchInput').addEventListener('input', function () {
+        applyFilters();
+        });
+
+        function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilters();
+        }
+
+        function applyFilters() {
+        const query   = document.getElementById('searchInput').value.toLowerCase().trim();
+        const sortVal = document.getElementById('sortSelect').value;
+        const list    = document.getElementById('taskList');
+        const cards   = Array.from(list.querySelectorAll('.task-card'));
+        let visible   = 0;
+
+        cards.forEach(card => {
+        const title  = card.dataset.title  || '';
+        const status = card.dataset.status || '';
+        const matchSearch = !query || title.includes(query);
+        const matchFilter = currentFilter === 'all' || status === currentFilter;
+        if (matchSearch && matchFilter) {
+        card.classList.remove('hidden-filter');
+        visible++;
+        } else {
+        card.classList.add('hidden-filter');
+        }
+        });
+
+        if (sortVal) {
+        const priorityOrder = { '2': 0, '1': 1, '0': 2 };
+        cards.sort((a, b) => {
+        if (sortVal === 'priority-asc') {
+        return priorityOrder[a.dataset.priority] - priorityOrder[b.dataset.priority];
+        } else if (sortVal === 'priority-desc') {
+        return priorityOrder[b.dataset.priority] - priorityOrder[a.dataset.priority];
+        } else if (sortVal === 'title-asc') {
+        return (a.dataset.title || '').localeCompare(b.dataset.title || '');
+        } else if (sortVal === 'title-desc') {
+        return (b.dataset.title || '').localeCompare(a.dataset.title || '');
+        }
+        return 0;
+        });
+        cards.forEach(card => list.appendChild(card));
+        }
+
+        document.getElementById('noResults').style.display =
+        (visible === 0 && cards.length > 0) ? 'block' : 'none';
+        }
+    </script>
+}

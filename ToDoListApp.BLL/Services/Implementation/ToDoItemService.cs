@@ -19,6 +19,31 @@ namespace ToDoListApp.BLL.Services.Implementation
             _mapper = mapper;
         }
 
+        public async Task<ResponseResult<List<GetToDoItemDto>>> GetAllToDoItemDtosByUserIdAsync(string userId)
+        {
+            try
+            {
+                var result = await _unitOfWork.ToDoItems.GetAllEntitiesAsync(t => t.Category.UserId == userId, t => t.Category);
+                var mappedResult = _mapper.Map<List<GetToDoItemDto>>(result);
+
+                return new ResponseResult<List<GetToDoItemDto>>
+                (
+                    true,
+                    null,
+                    mappedResult
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<GetToDoItemDto>>
+                (
+                    false,
+                    ex.Message,
+                    null
+                );
+            }
+        }
+
         public async Task<ResponseResult<List<GetToDoItemDto>>> GetAllToDoItemDtosByCategoryIdAsync(int categoryId)
         {
             try

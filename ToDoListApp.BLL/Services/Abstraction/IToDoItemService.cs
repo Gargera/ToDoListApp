@@ -7,6 +7,8 @@ namespace ToDoListApp.BLL.Services.Abstraction
 {
     public interface IToDoItemService
     {
+        public Task<ResponseResult<List<GetToDoItemDto>>> GetAllToDoItemDtosByUserIdAsync(string userId);
+
         public Task<ResponseResult<List<GetToDoItemDto>>> GetAllToDoItemDtosByCategoryIdAsync(int categoryId);
 
         public Task<ResponseResult<GetToDoItemDto>> GetToDoItemDtoByIdAsync(int id);

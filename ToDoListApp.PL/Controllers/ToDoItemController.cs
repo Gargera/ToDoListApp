@@ -10,12 +10,15 @@ namespace ToDoListApp.PL.Controllers
 
         private readonly ICategoryService _categoryService;
 
+        private readonly UserManager<ApplicationUser> _userManager;
+
         private readonly IMapper _mapper;
 
-        public ToDoItemController(IToDoItemService toDoItemService, ICategoryService categoryService, IMapper mapper)
+        public ToDoItemController(IToDoItemService toDoItemService, ICategoryService categoryService, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _toDoItemService = toDoItemService;
             _categoryService = categoryService;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -33,6 +36,25 @@ namespace ToDoListApp.PL.Controllers
                 ViewBag.Category = mappedCategory;
 
                 var mappedToDoItems = _mapper.Map<List<GetToDoItemVm>>(allToDoItems.Data);
+                return View(mappedToDoItems);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+
+                var allToDoItems = await _toDoItemService.GetAllToDoItemDtosByUserIdAsync(userId);
+                if (!allToDoItems.IsSuccess) return NotFound(allToDoItems.Message);
+
+                var mappedToDoItems = _mapper.Map<List<GetToDoItemVm>>(allToDoItems.Data);
+
                 return View(mappedToDoItems);
             }
             catch (Exception ex)
