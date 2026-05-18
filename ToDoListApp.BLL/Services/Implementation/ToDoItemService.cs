@@ -166,10 +166,12 @@ namespace ToDoListApp.BLL.Services.Implementation
 
                 if (result != null)
                 {
-                    var mappedResult = _mapper.Map<ToDoItem>(updateToDoItemDto);
-                    mappedResult.CreatedDate = result.CreatedDate;
+                    result.Title = updateToDoItemDto.Title;
+                    result.Priority = updateToDoItemDto.Priority;
+                    result.Description = updateToDoItemDto.Description;
+                    result.IsCompleted = updateToDoItemDto.IsCompleted;
 
-                    _unitOfWork.ToDoItems.UpdateEntity(mappedResult);
+                    _unitOfWork.ToDoItems.UpdateEntity(result);
                     var changes = await _unitOfWork.SaveChangesAsync();
 
                     if (changes > 0)

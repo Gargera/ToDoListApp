@@ -16,13 +16,14 @@ namespace ToDoListApp.PL.Mapper
                 CreateMap<GetCategoryDto, GetCategoryVm>().ReverseMap();
                 CreateMap<CreateCategoryDto, CreateCategoryVm>().ReverseMap();
                 CreateMap<UpdateCategoryDto, UpdateCategoryVm>().ReverseMap();
-
+                CreateMap<GetCategoryDto, UpdateCategoryVm>().ReverseMap();
+  
                 CreateMap<GetToDoItemDto, GetToDoItemVm>().ReverseMap();
                 CreateMap<CreateToDoItemDto, CreateToDoItemVm>().ReverseMap();
                 CreateMap<UpdateToDoItemDto, UpdateToDoItemVm>().ReverseMap();
                 CreateMap<GetToDoItemDto, UpdateToDoItemVm>().ReverseMap();
 
-            CreateMap<CreateUserVm, ApplicationUser>().ReverseMap();
+                CreateMap<CreateUserVm, ApplicationUser>().ReverseMap();
             }
         }
 }

@@ -23,8 +23,7 @@ namespace ToDoListApp.PL.Controllers
             try
             {
                 var userId = _userManager.GetUserId(User);
-                if(userId == null) return Forbid("You are not authorized to view categories.");
-
+                
                 var getCategories = await _categoryService.GetAllCategoriesDtosByUserIdAsync(userId);
                 if (!getCategories.IsSuccess) return BadRequest(getCategories.Message);
 
@@ -51,8 +50,7 @@ namespace ToDoListApp.PL.Controllers
                 if (!ModelState.IsValid) return View(createCategoryVm);
 
                 var userId = _userManager.GetUserId(User);
-                if (userId == null) return Forbid("You are not authorized to create category.");
-
+                
                 var checkUniqueName = await _categoryService.CheckCategoryUniqueNameAsync(c => c.Name == createCategoryVm.Name && c.UserId == userId);
                 if (!checkUniqueName.IsSuccess)
                 {
@@ -101,11 +99,13 @@ namespace ToDoListApp.PL.Controllers
             try
             {
                 var userId = _userManager.GetUserId(User);
-                if(userId == null) return Forbid("You are not authorized to update this category.");
-
+                
+                updateCategoryVm.Id = ViewData["CategoryId"] != null ? (int)ViewData["CategoryId"] : updateCategoryVm.Id;
                 if (!ModelState.IsValid) return View(updateCategoryVm);
 
-                var checkUniqueName = await _categoryService.CheckCategoryUniqueNameAsync(c => c.Name == updateCategoryVm.Name && c.UserId == userId);
+                var checkUniqueName = await _categoryService.CheckCategoryUniqueNameAsync(c => c.Name == updateCategoryVm.Name && 
+                                                                                               c.UserId == userId &&
+                                                                                               c.Id != updateCategoryVm.Id); //maybe user didn't change the Name :)
                 if (!checkUniqueName.IsSuccess)
                 {
                     ModelState.AddModelError("Name", checkUniqueName.Message);

@@ -166,8 +166,10 @@ namespace ToDoListApp.BLL.Services.Implementation
                 var result = await _unitOfWork.Categories.GetEntityByIdAsync(updateCategoryDto.Id);
                 if (result != null)
                 {
-                    var mappedResult = _mapper.Map<Category>(updateCategoryDto);
-                    _unitOfWork.Categories.UpdateEntity(mappedResult);
+                    result.Name = updateCategoryDto.Name;
+                    result.Description = updateCategoryDto.Description;
+                    
+                    _unitOfWork.Categories.UpdateEntity(result);
                     var changes = await _unitOfWork.SaveChangesAsync();
 
                     if (changes > 0)

@@ -133,12 +133,17 @@ namespace ToDoListApp.PL.Controllers
         {
             try
             {
+                updateToDoItemVm.Id = ViewData["Id"] != null ? (int)ViewData["Id"] : updateToDoItemVm.Id;
+                updateToDoItemVm.CategoryId = ViewData["CategoryId"] != null ? (int)ViewData["CategoryId"] : updateToDoItemVm.CategoryId;
+                
                 if (!ModelState.IsValid) return View(updateToDoItemVm);
 
                 var category = await _categoryService.GetCategoryDtoByIdAsync(updateToDoItemVm.CategoryId);
                 if (!category.IsSuccess) return NotFound(category.Message);
 
-                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(t => t.Title == updateToDoItemVm.Title && t.CategoryId == updateToDoItemVm.CategoryId && t.Id != updateToDoItemVm.Id);
+                var titleUnique = await _toDoItemService.CheckToDoItemUniqueTitleAsync(t => t.Title == updateToDoItemVm.Title && 
+                                                                                            t.CategoryId == updateToDoItemVm.CategoryId && 
+                                                                                            t.Id != updateToDoItemVm.Id); //maybe user didn't change the title :)
                 if (!titleUnique.IsSuccess)
                 {
                     ModelState.AddModelError("Title", titleUnique.Message);
