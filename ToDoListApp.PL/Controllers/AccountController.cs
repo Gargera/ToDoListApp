@@ -89,7 +89,7 @@ namespace ToDoListApp.PL.Controllers
                 var user = await _userManager.FindByNameAsync(logInUserVm.UserName);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid username or password. Please try again.");
+                    ModelState.AddModelError("UserName", "Invalid username or password. Please try again.");
                     return View(logInUserVm);
                 }
 
@@ -101,7 +101,9 @@ namespace ToDoListApp.PL.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid username or password. Please try again.");
+                    ModelState.AddModelError("UserName", "Invalid username or password. Please try again.");
+                    ModelState.AddModelError("Password", "Invalid username or password. Please try again.");
+
                     return View(logInUserVm);
                 }
             }
