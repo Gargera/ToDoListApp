@@ -68,3 +68,4 @@ logs/
 .env
 .env.local
 .env.*.local
+/ToDoListApp.PL/Properties/PublishProfiles/site70516-WebDeploy.pubxml
