@@ -6,7 +6,7 @@
 
 <br/>
 
-[![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-8.0-512BD4?style=for-the-badge&logo=.net)]()
+[![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-10.0-512BD4?style=for-the-badge&logo=.net)]()
 [![C#](https://img.shields.io/badge/C%23-Backend-239120?style=for-the-badge&logo=c-sharp)]()
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-Database-CC2927?style=for-the-badge&logo=microsoftsqlserver)]()
 [![Entity Framework Core](https://img.shields.io/badge/EF%20Core-ORM-7A3E9D?style=for-the-badge)]()
@@ -38,8 +38,7 @@ Each user gets a personal workspace with full control over their categories and 
 - Auto-created **General** category on registration (protected — cannot be edited or deleted)
 - Create, update, and delete categories
 - Create, update, and delete tasks inside any category
-- Tasks without a selected category are automatically added to **General**
-- Search and sort categories by name
+- Search categories by name
 - Filter and sort tasks by priority and status
 - View task details in a popup modal
 - View all tasks across all categories in one page
@@ -150,7 +149,7 @@ Tasks Page → Create / Update / Delete Tasks
 | AutoMapper | Object mapping |
 | JavaScript | Client-side interactions & modals |
 | LINQ | Data querying |
-| Generic Repository + UoW | Data abstraction & transaction management |
+| Generic Repository + UnitOfWork | Data abstraction & transaction management |
 
 ---
 
