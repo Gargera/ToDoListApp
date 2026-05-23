@@ -101,7 +101,7 @@
 
     .user-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr auto;
         align-items: center;
         gap: 16px;
         padding: 16px 24px;
@@ -161,6 +161,25 @@
         font-size: 12px;
         color: #6b7280;
         margin-top: 2px;
+    }
+
+    /* ── Role Badge ── */
+    .role-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .role-admin {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .role-user {
+        background: #eff6ff;
+        color: #3b82f6;
     }
 
     /* ── Empty / No results ── */
@@ -242,6 +261,7 @@
             <div class="user-row header-row">
                 <div class="header-label">User</div>
                 <div class="header-label">Email</div>
+                <div class="header-label">Role</div>
             </div>
 
             @foreach (var user in users)
@@ -260,6 +280,12 @@
                     </div>
 
                     <div style="font-size:13px; color:#6b7280;">@user.Email</div>
+
+                    <div>
+                        <span class="role-badge @(user.Role == "Admin" ? "role-admin" : "role-user")">
+                            @user.Role
+                        </span>
+                    </div>
 
                 </div>
             }

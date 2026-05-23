@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ToDoListApp.DAL.DataSeeding.Abstraction;
+using ToDoListApp.DAL.Repositories.UnitOfWorkPattern.Abstraction;
 
 namespace ToDoListApp.DAL.DataSeeding.Implementation
 {
@@ -7,11 +8,13 @@ namespace ToDoListApp.DAL.DataSeeding.Implementation
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DataInitializer(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public DataInitializer(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task InitializeIdentityDataAsync()

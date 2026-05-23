@@ -33,9 +33,10 @@ namespace ToDoListApp.PL.Controllers
                 {
                     vms.Add(new AdminUserVm
                     {
-                        Id       = user.Id,
+                        Id = user.Id,
                         UserName = user.UserName,
-                        Email    = user.Email
+                        Email = user.Email,
+                        Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
                     });
                 }
 
