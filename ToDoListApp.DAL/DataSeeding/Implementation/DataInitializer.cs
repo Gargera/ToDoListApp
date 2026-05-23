@@ -27,30 +27,6 @@ namespace ToDoListApp.DAL.DataSeeding.Implementation
                 var adminRole = new IdentityRole("Admin");
                 await _roleManager.CreateAsync(adminRole);
             }
-
-            var adminEmail = "esraaTaha@gmail.com";
-
-            var admin = await _userManager.FindByEmailAsync(adminEmail);
-            if (admin is null)
-            {
-                admin = new ApplicationUser
-                {
-                    UserName = "EsraaTaha",
-                    Email = adminEmail
-                };
-
-                var res = await _userManager.CreateAsync(admin, "HeHe2001");
-
-                if (!res.Succeeded)
-                {
-                    throw new Exception($"Failed to create admin user: {string.Join(", ", res.Errors.Select(e => e.Description))}");
-                }
-            }
-
-            if (!await _userManager.IsInRoleAsync(admin, "Admin"))
-            {
-                await _userManager.AddToRoleAsync(admin, "Admin");
-            }
         }
     }
 }
